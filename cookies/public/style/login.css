@@ -1,0 +1,121 @@
+/* Modern Glass-style Login Form */
+:root{
+  --bg: #0f1724;
+  --accent: #38bdf8;
+  --muted: #a99e9e;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html, body{
+  height:100%;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(180deg, var(--bg), #081028);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+form{
+  width:100%;
+  max-width:420px;
+  padding:36px 40px;
+  border-radius:14px;
+  background: rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  text-align:center;
+}
+
+/* Form heading */
+form::before{
+  content: "Login";
+  display:block;
+  font-size:22px;
+  font-weight:600;
+  margin-bottom:14px;
+  color:white;
+}
+
+/* Inputs */
+input[type="email"],
+input[type="password"]{
+  padding:14px 16px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.02);
+  color:#e6eef6;
+  font-size:15px;
+  outline:none;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .1s ease;
+}
+
+input::placeholder{
+  color: var(--muted);
+}
+
+/* Input focus */
+input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 4px 18px rgba(56,189,248,0.15);
+  transform: translateY(-1px);
+}
+
+/* Submit button */
+button[type="submit"]{
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+  background: linear-gradient(90deg, var(--accent), #0ea5e9);
+  color:#06202c;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+button[type="submit"]:hover{
+  transform: translateY(-2px);
+  box-shadow:0 14px 30px rgba(56,189,248,0.18);
+}
+
+button[type="submit"]:active{
+  transform: translateY(0);
+  box-shadow:none;
+}
+
+/* Create account link */
+form a{
+  font-size:14px;
+  color: var(--muted);
+  text-decoration:none;
+  margin-top:6px;
+  display:inline-block;
+  transition: color .2s ease;
+}
+
+form a:hover{
+  color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width:480px){
+  form{
+    padding:28px 32px;
+    gap:12px;
+  }
+  form::before{
+    font-size:20px;
+  }
+  input[type="email"], input[type="password"]{
+    padding:12px 14px;
+  }
+  button[type="submit"]{
+    padding:12px;
+    font-size:14px;
+  }
+}
