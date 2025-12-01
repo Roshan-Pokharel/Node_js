@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const userData = require('./models/user');
+const post = require('./models/post');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser ');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cookieParser());
@@ -22,6 +23,13 @@ app.get('/', (req, res) => {
 
 app.post('/create', async (req, res) => {
   let { username, email, password, age } = req.body;
+  if(!username || !email || !password || !age){
+    return res.render('fillall');
+  }
+  const user = await userData.findOne({ email });
+  if (user) {
+    return res.send('User already exists');
+  }
   bcrypt.genSalt(10,(err, salt) => {
    bcrypt.hash(password, salt, async (err, hash) => {
     let newUserData = await userData.create({
@@ -30,7 +38,7 @@ app.post('/create', async (req, res) => {
         password :hash,
         age
   });
-    const token =  jwt.sign({email}, 'secretkey',{expiresIn : '2h'});
+    const token =  jwt.sign({email , userId : newUserData._id}, 'secretkey',{expiresIn : '2h'});
       res.cookie('token', token);
       res.redirect('/dashboard');
  
@@ -42,7 +50,7 @@ app.post('/create', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 });
-    res.render('login');
+    res.redirect('login');
 });
 app.get('/login', (req, res) => {
     res.render('login');
@@ -59,7 +67,8 @@ app.post('/verify', async (req, res) => {
     if (!isMatch) {
       return res.send('Invalid username or password');
     }
-    const token = jwt.sign({ email }, 'secretkey', { expiresIn: '2h' });
+    
+    const token = jwt.sign({ email , userId : user._id}, 'secretkey', { expiresIn: '2h' });
     res.cookie('token', token);
     res.redirect('/dashboard');
 
@@ -70,14 +79,84 @@ app.post('/verify', async (req, res) => {
 });
 
 
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard',isAuthenticated, (req, res) => {
+  res.render('dashboard');
+});
+
+function isAuthenticated(req, res, next) {
   const token = req.cookies.token;
   if (!token) {
     return res.redirect('/login');
-  }   
-  res.render('dashboard');
+  }
+  try {
+    const decoded = jwt.verify(token, 'secretkey');   
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.redirect('/login');
+  }
+}
+
+app.get('/profile', isAuthenticated, async (req, res) => {
+    let user = await userData.findById(req.user.userId).populate('posts');
+   // console.log(user);
+    res.render('profile', {user});
 });
   
+app.post('/uploads', isAuthenticated, async (req, res) => {
+    let {content} = req.body;
+    //console.log(title, content );
+    let newPost = await post.create({
+      user: req.user.userId,
+      content
+    });
+    await userData.findByIdAndUpdate(req.user.userId, {
+      $push: { posts: newPost._id }
+    });
+    res.redirect('/profile');
+    });
+
+  app.get('/like/:id', isAuthenticated, async (req, res) => {
+      let postId = req.params.id;
+      let userId = req.user.userId;
+      let postItem = await post.findById(postId);
+      if (!postItem.likes.includes(userId)) {
+        postItem.likes.push(userId);
+      }
+      else {
+        postItem.likes = postItem.likes.filter(id => id.toString() !== userId);
+      }
+      await postItem.save();
+      res.redirect('/posts');
+    });
+
+    app.get('/posts', isAuthenticated, async (req, res) => {
+      let posts = await post.find().populate('user').sort({ createdAt: -1 });
+      res.render('post', { posts });
+    });
+
+    app.get('/edit/:id', isAuthenticated, async (req, res) => {
+      let postId = req.params.id;
+      let postItem = await post.findById(postId);
+      let user = await userData.findById(req.user.userId);
+      res.render('edit', { post: postItem , user});
+    });
+
+    app.post('/edits/:id', isAuthenticated, async (req, res) => {
+      let postId = req.params.id;
+      let { content } = req.body;
+      await post.findByIdAndUpdate(postId, { content });
+      res.redirect('/profile');
+    });
+
+    app.get('/delete/:id', isAuthenticated, async (req, res) => {
+      let postId = req.params.id;
+      await post.findByIdAndDelete(postId);
+      await userData.findByIdAndUpdate(req.user.userId, {
+        $pull: { posts: postId }
+      });
+      res.redirect('/profile');
+    });
 
 
 app.listen(3000);

@@ -1,0 +1,179 @@
+/* Global */
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+
+
+/* Back Button */
+.back-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  text-decoration: none;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  transition: 0.25s;
+}
+
+.like-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff7675, #fd79a8);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  transition: 0.25s;
+}
+
+.back-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+}
+
+.edit-btn{
+  display: inline-block;
+  background: linear-gradient(135deg, #00b894, #55efc4);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  transition: 0.25s;
+}
+
+.edit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+}
+
+.delete-btn{
+  display: inline-block;
+  background: linear-gradient(135deg, #d63031, #e17055);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  transition: 0.25s;  
+
+}
+
+.delete-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+}
+/* Page Title */
+h1 {
+  text-align: center;
+  font-size: 38px;
+  color: #2d3436;
+  margin-bottom: 10px;
+}
+
+h2 {
+  text-align: center;
+  color: #636e72;
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+/* Post Form */
+form {
+  max-width: 700px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 20px;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+textarea {
+  width: 95%;
+  height: 140px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #dcdde1;
+  font-size: 16px;
+  resize: none;
+  background: #fff;
+  outline: none;
+  transition: 0.25s;
+}
+
+textarea:focus {
+  border-color: #0984e3;
+  box-shadow: 0 0 6px rgba(9, 132, 227, 0.3);
+}
+
+/* Submit Button */
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #0984e3, #74b9ff);
+  color: white;
+  cursor: pointer;
+  align-self: flex-end;
+  width: 160px;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Posts Container */
+.posts-container {
+  max-width: 700px;
+  margin: 40px auto 0 auto;
+}
+
+/* Individual Post */
+.post {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 18px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  transition: 0.25s;
+}
+
+.post:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.post p:first-child {
+  font-weight: bold;
+  color: #0984e3;
+  margin-bottom: 8px;
+}
+
+.post p:last-child {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2d3436;
+}

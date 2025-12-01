@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/style/profile.css">
+
+</head>
+<body>
+  <a href="/dashboard" class="back-btn">Back to Dashboard</a>
+  <h1>User Profile</h1>
+  <h2>Hello, Welcome <%= user.username %></h2>
+  <p>write a new post</p>
+  <form action="/uploads" method="post">
+    <textarea name="content" placeholder="what are in your mind"></textarea>
+    <button type="submit">Submit Post</button>
+  </form>
+  <h3>posts</h3>
+  <div class="posts-container">
+    
+    <% user.posts.reverse().forEach(function(post) { %>
+      <div class="post">
+        <p>@<%=user.username %></p>
+        <p> <%= post.content %></p>
+         <% let liked = post.likes.includes(user._id.toString()); %>
+        <a href="/like/<%=post.id %>" class="like-btn">
+          <%=post.likes.length %>  <% if (liked) { %>
+        Unlike
+      <% } else { %>
+        Like
+      <% } %></a>
+      <a href="/edit/<%=post.id %>" class="edit-btn">Edit</a>
+       <a href="/delete/<%=post.id %>" class="delete-btn">Delete</a>
+      </div>
+    <% }); %>
+      
+  </div>
+</body>
+</html>
