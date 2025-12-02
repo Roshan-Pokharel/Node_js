@@ -7,9 +7,13 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   age: Number,
+  profilepic: {
+   type: String,
+    default: 'defaultpic.jpg'
+  },
   posts: [{ 
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'post'   // lowercase to match post model
+    ref: 'post'   
   }] 
 });
 

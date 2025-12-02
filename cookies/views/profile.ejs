@@ -10,7 +10,14 @@
 <body>
   <a href="/dashboard" class="back-btn">Back to Dashboard</a>
   <h1>User Profile</h1>
+  <div class="profile-header">
+    <a href="/profile/upload">
+       <img src="/images/<%= user.profilepic %>"
+       alt="Profile Picture" class="profile-pic">
+    </a>
+  
   <h2>Hello, Welcome <%= user.username %></h2>
+</div>
   <p>write a new post</p>
   <form action="/uploads" method="post">
     <textarea name="content" placeholder="what are in your mind"></textarea>

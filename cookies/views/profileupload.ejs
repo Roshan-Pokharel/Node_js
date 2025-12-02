@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/style/profileupload.css">
+
+</head>
+<body>
+  <a href="/profile" class="back-btn">Back to Profile</a>
+  <h1>Upload your Profile Picture</h1>
+  <form action="/profile/upload/image" method="POST" enctype="multipart/form-data">
+    <input type="file" name="image" required>
+    <button type="submit">Upload Profile Picture</button>
+  </form>
+</body>
+</html>

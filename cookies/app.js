@@ -5,6 +5,8 @@ const post = require('./models/post');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const upload = require('./utils/multer');
+const user = require('./models/user');
 
 const app = express();
 app.use(cookieParser());
@@ -42,9 +44,9 @@ app.post('/create', async (req, res) => {
       res.cookie('token', token);
       res.redirect('/dashboard');
  
-});
+         });
 
-});
+      });
 
 });
 
@@ -157,6 +159,18 @@ app.post('/uploads', isAuthenticated, async (req, res) => {
       });
       res.redirect('/profile');
     });
+
+    app.get('/profile/upload', isAuthenticated, (req, res) => {
+      res.render('profileupload');
+    });
+
+     app.post('/profile/upload/image', upload.single('image') , isAuthenticated, async(req, res) => {
+     let profilepic = req.file.filename;
+      let user = await userData.findOne({email : req.user.email});
+      user.profilepic = profilepic;
+      await user.save();
+      res.redirect('/profile');
+      });
 
 
 app.listen(3000);
