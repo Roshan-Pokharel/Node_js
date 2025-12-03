@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Import Tailwind compiled CSS -->
+  <link href="./output.css" rel="stylesheet">
+
+  <title>Document</title>
+</head>
+
+<body class="bg-slate-900 min-h-screen flex flex-col gap-8 p-6">
+  <!-- bg-slate-900: Dark background
+       min-h-screen: Full screen height
+       flex flex-col: Use flexbox and arrange items vertically
+       gap-8: Space between child blocks
+       p-6: Padding around content -->
+
+  <!-- Centered Button Container -->
+  <div class="mx-auto flex justify-center items-center">
+    <!-- mx-auto: Center this block horizontally 
+         flex: Use flexbox
+         justify-center: Center horizontally
+         items-center: Center vertically -->
+
+    <button class="bg-blue-500 hover:bg-blue-900 text-white font-bold rounded-md h-10 px-6">
+      <!-- bg-blue-500: Button background color
+           hover:bg-blue-900: Darker blue on hover
+           text-white: Text color
+           font-bold: Bold font
+           rounded-md: Slight rounded corners
+           h-10: Fixed height
+           px-6: Horizontal padding (width made by padding) -->
+      click me
+    </button>
+  </div>
+
+  <!-- Card Container -->
+  <div class="bg-amber-500 rounded-md md:flex items-center justify-center p-4  gap-4 w-md mx-auto my-auto ">
+    <!-- bg-amber-500: Amber background
+         rounded-md: Rounded corners
+         md:flex: Flex layout applied only on medium screens and above
+         items-center: Vertical alignment (inside flex)
+         justify-center: Horizontal alignment
+         p-4: Padding inside
+         gap-4: Space between children -->
+
+    <!-- Image Wrapper -->
+    <div>
+      <img
+        class="md:w-80 w-110 h-60  object-cover rounded-md mb-2.5"
+        src="https://images.pexels.com/photos/29612209/pexels-photo-29612209.png"
+        alt="image"
+      />
+      <!-- w-24 h-24: Fixed size image
+           object-cover: Crop image to fill container
+           rounded-md: Rounded corners -->
+    </div>
+
+    <!-- Text Section -->
+    <div class="text-xl text-slate-800 font-bold">
+      Tailwind CSS Card Example
+      <!-- text-sm: Smaller text
+           font-medium: Medium weight
+           text-slate-800: Dark readable text color -->
+     <p class="font-light">Lorem ipsum <span class="bg-red-500 px-1 ">dolor</span>, sit amet consectetur adipisicing.</p> 
+    </div>
+  </div>
+
+</body>
+</html>
