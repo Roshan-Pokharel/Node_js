@@ -709,6 +709,12 @@
       outline-style: none;
     }
   }
+  .md\:border {
+    @media (width >= 48rem) {
+      border-style: var(--tw-border-style);
+      border-width: 1px;
+    }
+  }
   .md\:border-2 {
     @media (width >= 48rem) {
       border-style: var(--tw-border-style);

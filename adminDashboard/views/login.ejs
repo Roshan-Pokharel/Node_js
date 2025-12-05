@@ -4,18 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/stylesheet/output.css">
-  <title>registration</title>
+  <title>Login</title>
 </head>
 <body  class="bg-slate-900 h-screen w-screen text-white">
   <!-- logo section goes here -->
   <div class="text-4xl m-4">Durga Grocery</div>
   <!-- main body for sign up form  -->
   <div class= "h-auto w-90 flex flex-col justify-center items-center mx-auto my-auto  mt-10 md:border md:border-white  p-10 rounded-2xl">
-    <div class="text-2xl mb-10">Sign Up</div>
+    <div class="text-2xl mb-10">Log In</div>
 
     <!-- this is form for registration -->
-      <form class="flex flex-col " method="POST" action="/register/user">
-        <input class="border-b outline-none items-center mb-7 p-1 w-70" placeholder="Name" name="username" required>
+      <form class="flex flex-col " method="POST" action="/login/user">
         <input class="border-b outline-none items-center mb-7 p-1 w-70" placeholder="Email" type="email" name="email" required>
 
         <div class="relative w-70 mb-7">
@@ -46,42 +45,18 @@
             </button>
           </div>
 
-        <button class="bg-blue-600  mt-5 p-1 rounded-md hover:bg-blue-500 cursor-pointer">Sign Up</button>
+        <button class="bg-blue-600  mt-5 p-1 rounded-md hover:bg-blue-500 cursor-pointer">Log in</button>
         <div class="mt-5">
         <input class="bg-slate-900 hover:size-4" type="checkbox" id="remember" name="remember" value="1">
         <label for="remember">Remind me</label><br>
         </div>
       </form>
-      <!-- this is line for other login methods -->
-    <div class="mt-5 flex flex-row items-center gap-3">
-      <div class="border-b w-18"></div>
-      <div class="text-sm">or sign up with</div>
-      <div class="border-b w-18"></div>
-    </div>
-    <!-- this is other login methods like google facebook github -->
-     <div class="flex flex-row gap-8 ">
-      <button class="mt-5 p-1 rounded-md cursor-pointer  outline-none mb-3">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-       alt="Google"
-       class="w-6 h-6">
-      </button>
-      <button class="mt-5 p-1 rounded-md cursor-pointer  mb-3">
-        <img src="https://www.svgrepo.com/show/303113/facebook-icon-logo.svg"
-       alt="Facebook"
-       class="w-6 h-6">
-      </button>
-      <button class="mt-5 p-1 rounded-md cursor-pointer mb-3">
-        <img src="https://www.svgrepo.com/show/512317/github-142.svg"
-       alt="Github"
-       class="w-7 h-7">
-      </button>
-     </div>
-  </div>
+ 
   <!-- this section make user to redirect to login page if already have account -->
    <div class="flex justify-center gap-3 mt-5">
     <div>Already have an account?</div>
     <div> 
-      <a class="text-blue-600 underline hover:text-blue-500 mb-5" href="/login">Sign in</a>
+      <a class="text-blue-600 underline hover:text-blue-500 mb-5" href="/register">sign up</a>
     </div>
    </div>
    <script type="text/javascript" src="/javascript/eyeToggle.js"></script>
