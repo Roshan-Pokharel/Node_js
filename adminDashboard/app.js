@@ -1,28 +1,51 @@
+require('dotenv').config();
 const express = require('express'); 
 const path = require('path');  
 const mongoose = require('./config/mongoose-connection');
 const app = express();
 const cookieParser = require('cookie-parser');
+const flash = require('connect-flash')
 const userRouter = require('./routes/userRouter');
+const adminRouter = require('./routes/adminRouter');
 const isAuthenticated = require('./middlewares/authMiddleware');
-app.use(cookieParser());
+const isAdmin = require('./middlewares/adminMiddleware');
+const secretkey = process.env.SECRET_KEY;
+const session = require('express-session');
 
+app.use(session({
+  secret: process.env.SECRET_KEY,
+  resave: false,
+  saveUninitialized: true
+}));
+
+app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(flash());
 
 app.use('/', userRouter);
+app.use('/', adminRouter);
+
 app.get('/dashboard',isAuthenticated, (req, res) => {
     res.render('dashboard');
 });
 
+app.get('/admindashboard',isAdmin, (req, res) => {
+    res.render('admindashboard');
+});
+
+
 app.get('/logout', (req, res)=>{
-  res.cookie('authToken', "")
+  res.cookie('authToken', "");
+  res.cookie('adminAuthToken', "");
   res.redirect('/login');
-} )
+})
+
+
 
 app.listen(3000, () => {
     console.log('Admin Dashboard is running on port 3000');
-}); 
+});
