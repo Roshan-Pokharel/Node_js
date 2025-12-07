@@ -13,6 +13,7 @@ const isAuthenticated = require('./middlewares/authMiddleware');
 const isAdmin = require('./middlewares/adminMiddleware');
 const secretkey = process.env.SECRET_KEY;
 const session = require('express-session');
+const productModel = require('./model/product');
 
 app.use(session({
   secret: process.env.SECRET_KEY,
@@ -33,8 +34,9 @@ app.use('/', adminRouter);
 app.use('/', productRouter);
 
 
-app.get('/dashboard',isAuthenticated, (req, res) => {
-    res.render('dashboard');
+app.get('/dashboard',isAuthenticated, async (req, res) => {
+    const products = await productModel.find();
+    res.render('dashboard', {products});
 });
 
 app.get('/admindashboard',isAdmin, (req, res) => {

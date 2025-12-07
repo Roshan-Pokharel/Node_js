@@ -3,13 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home page</title>
+  <title>Admin Dashboard</title>
+ <link rel="stylesheet" href="stylesheet/output.css">
 </head>
-<body>
-  <h1>Welcome to the Admin Dashboard Home Page</h1>
-  <% products.forEach((product)=>{ %>
+<body class="bg-slate-900 min-h-screen ">
+  <div class="container mx-auto p-6">
+    <nav class="bg-white shadow-md">
+  <div class="container mx-auto px-6 py-4 flex items-center justify-between">
     
-  <% }) %>
-  <a href="/logout">click here to logout</a>
+    <!-- Logo -->
+    <div class="flex items-center">
+      <img src="/path/to/logo.png" alt="Logo" class="h-10 w-10 mr-2">
+      <span class="hidden md:block text-xl font-bold text-gray-800">User Dashboard</span>
+    </div>
+
+    <!-- Navigation Links (Desktop) -->
+    <div class="hidden md:flex items-center space-x-6">
+      <a href="/dashboard" class="text-gray-700 hover:text-blue-500 font-medium transition-colors duration-200">Home</a>
+      <a href="/categories" class="text-gray-700 hover:text-blue-500 font-medium transition-colors duration-200">Categories</a>
+      <a href="/products" class="text-gray-700 hover:text-blue-500 font-medium transition-colors duration-200">Products</a>
+      <a href="/orders" class="text-gray-700 hover:text-blue-500 font-medium transition-colors duration-200">Orders</a>
+      <a href="/users" class="text-gray-700 hover:text-blue-500 font-medium transition-colors duration-200">Users</a>
+    </div>
+
+    <!-- Search Bar + Profile / Logout -->
+    <div class="flex items-center space-x-4">
+      <!-- Search -->
+      <div class="relative ">
+        <input type="text" placeholder="Search products..." 
+               class="w-64 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Profile / Logout -->
+      <span class="hidden  md:block text-white border bg-slate-700 rounded-full h-10 w-10 items-center">User</span>
+      <a href="/logout" class="hidden md:block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200">Logout</a>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="hidden md:hidden" id="mobile-menu">
+    <a href="/dashboard" class="block px-6 py-2 text-gray-700 hover:bg-gray-100">Home</a>
+    <a href="/categories" class="block px-6 py-2 text-gray-700 hover:bg-gray-100">Categories</a>
+    <a href="/products" class="block px-6 py-2 text-gray-700 hover:bg-gray-100">Products</a>
+    <a href="/orders" class="block px-6 py-2 text-gray-700 hover:bg-gray-100">Orders</a>
+    <a href="/users" class="block px-6 py-2 text-gray-700 hover:bg-gray-100">Users</a>
+    <a href="/logout" class="block px-6 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+  </div>
+</nav>
+
+    <!-- Product Flex Container -->
+    <div class="flex flex-wrap mx-5 md:mx-4 ">
+      <% products.forEach((product) => { %>
+        <!-- Single Product Card -->
+        <div class="bg-slate-200 rounded-lg shadow-lg overflow-hidden m-4 w-40 md:w-64 hover:shadow-slate-200 hover:shadow-2xl transition-shadow duration-300 shrink-0">
+          <!-- Product Image -->
+          <% if (product.image && product.image.data) { %>
+            <img class="w-full h-30 md:h-50 object-contain p-4 bg-slate-200" 
+                 src="data:<%= product.image.contentType %>;base64,<%= product.image.data.toString('base64') %>" 
+                 alt="<%= product.productname %>">
+          <% } else { %>
+            <div class="w-full  h-30 md:h-50  bg-slate-200 flex items-center justify-center">
+              <span class="text-slate-600">No Image</span>
+            </div>
+          <% } %>
+
+          <!-- Product Info -->
+          <div class="p-4 pt-1 flex flex-col justify-between h-30 md:h-40 text-sm md:font-bold">
+            <h2 class="text-md md:text-xl font-semibold md:font-bold text-gray-800 line-clamp-2"><%= product.productname %></h2>
+            <div class="md:mt-2">
+              <p class="text-gray-700 font-medium md:font-bold text-base md:text-lg">Rs <%= product.price %></p>
+              <% if(product.discount) { %>
+                <p class="text-red-500 text-sm font-light md:font-bold">Discount: <%= product.discount %>%</p>
+              <% } %>
+            </div>
+            <button class="mt-1 md:mt-4 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold  py-0.5 md:py-2 rounded w-full transition-colors duration-200">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Logout -->
+    <div class="mt-6">
+      <a href="/logout" class="text-blue-600 hover:underline">Click here to logout</a>
+    </div>
+  </div>
+  <script src="/javascript/mobileNabBar.js"></script>
 </body>
 </html>

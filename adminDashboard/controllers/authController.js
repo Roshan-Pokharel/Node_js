@@ -1,5 +1,6 @@
 const userModel = require('../model/user');
-const adminModel= require('../model/admin')
+const adminModel= require('../model/admin');
+const productModel= require('../model/product');
 const bcrypt = require('bcrypt');
 const cookies = require('cookie-parser');
 const jwt = require('jsonwebtoken');
@@ -41,6 +42,7 @@ module.exports.registerAdmin = async (req, res) => {
 }
 
 module.exports.registerUser = async (req, res) => {
+     const products = await productModel.find();
     const { username, password, email, remember } = req.body;
     let usernameFound =await  userModel.findOne({email : email});
     if (usernameFound) {
