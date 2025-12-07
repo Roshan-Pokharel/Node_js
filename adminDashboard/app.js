@@ -3,10 +3,12 @@ const express = require('express');
 const path = require('path');  
 const mongoose = require('./config/mongoose-connection');
 const app = express();
+const router = require('router');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash')
 const userRouter = require('./routes/userRouter');
 const adminRouter = require('./routes/adminRouter');
+const productRouter = require('./routes/productRouter');
 const isAuthenticated = require('./middlewares/authMiddleware');
 const isAdmin = require('./middlewares/adminMiddleware');
 const secretkey = process.env.SECRET_KEY;
@@ -28,6 +30,8 @@ app.use(flash());
 
 app.use('/', userRouter);
 app.use('/', adminRouter);
+app.use('/', productRouter);
+
 
 app.get('/dashboard',isAuthenticated, (req, res) => {
     res.render('dashboard');

@@ -1,4 +1,3 @@
-const cookies = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const adminsecretkey = process.env.ADMIN_SECRET_KEY;
 

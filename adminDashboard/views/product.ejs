@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheet/output.css" />
+  <title>Dashboard</title>
+</head>
+
+<body class="bg-slate-900 text-white font-medium">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between px-8 py-5 border-b border-slate-800">
+    <h1 class="text-3xl font-bold tracking-wide">Product Dashboard</h1>
+  <a href="/admindashboard"
+      class="bg-purple-600 hover:bg-purple-700 active:scale-95 transition text-white font-semibold px-4 py-2 rounded-md shadow-md">
+      Back
+    </a>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto mt-14 px-6 lg:px-0">
+
+    <!-- Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Card 1 -->
+      <a href="/product/add" class="group block">
+        <div
+          class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg transition-transform duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/60 group-hover:shadow-purple-500/30">
+
+          <!-- Top -->
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center group-hover:bg-purple-700 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="2.2" stroke="white" class="w-7 h-7">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </div>
+
+            <h2 class="text-xl font-semibold tracking-wide">Add Product</h2>
+          </div>
+
+          <!-- Bottom -->
+          <div class="mt-6">
+            <p class="text-4xl font-bold text-purple-400">500+</p>
+            <p class="text-sm text-slate-400 mt-1">products created</p>
+          </div>
+
+        </div>
+      </a>
+
+      <!-- Card 2 -->
+      <a href="/order/management" class="group block">
+        <div
+          class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg transition-transform duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/60 group-hover:shadow-purple-500/30">
+
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center group-hover:bg-purple-700 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="2.2" stroke="white" class="w-7 h-7">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 8.25h18m-10.5 7.5h1.5M3 12h18M5.25 15h.008v.008H5.25V15zm13.5 0h.008v.008h-.008V15z" />
+              </svg>
+            </div>
+
+            <h2 class="text-xl font-semibold tracking-wide">Manage Orders</h2>
+          </div>
+
+          <div class="mt-6">
+            <p class="text-4xl font-bold text-purple-400">1000+</p>
+            <p class="text-sm text-slate-400 mt-1">orders delivered</p>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 3 -->
+      <a href="/analysis" class="group block">
+        <div
+          class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg transition-transform duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/60 group-hover:shadow-purple-500/30">
+
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center group-hover:bg-purple-700 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="2.2" stroke="white" class="w-7 h-7">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3v18h18M7 13.5l4.5-4.5 3 3 4.5-4.5" />
+              </svg>
+            </div>
+
+            <h2 class="text-xl font-semibold tracking-wide">Sales Analytics</h2>
+          </div>
+
+          <div class="mt-6">
+            <p class="text-4xl font-bold text-purple-400">10+</p>
+            <p class="text-sm text-slate-400 mt-1">performance insights</p>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

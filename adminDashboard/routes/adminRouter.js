@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {registerAdmin} = require('../controllers/authController');
-const {isAdmin} = require('../middlewares/authMiddleware');
+const isAdmin = require('../middlewares/authMiddleware');
 
 router.get('/admin', (req, res) => { 
     res.render('adminreg');
