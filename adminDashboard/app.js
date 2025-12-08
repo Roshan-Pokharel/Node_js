@@ -34,13 +34,14 @@ app.use('/', adminRouter);
 app.use('/', productRouter);
 
 
-app.get('/dashboard',isAuthenticated, async (req, res) => {
+app.get('/dashboard', isAuthenticated , async (req, res) => {
     const products = await productModel.find();
     res.render('dashboard', {products});
 });
 
-app.get('/admindashboard',isAdmin, (req, res) => {
-    res.render('admindashboard');
+app.get('/admindashboard',isAdmin, async(req, res) => {
+  const products = await productModel.find();
+  res.render('admindashboard', {products});
 });
 
 

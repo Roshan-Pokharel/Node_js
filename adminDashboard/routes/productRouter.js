@@ -6,7 +6,9 @@ const isAdmin = require('../middlewares/adminMiddleware');
 const { route } = require('./userRouter');
 
 router.get('/product' , isAdmin, async (req, res)=>{
-  res.render('product');
+  const products = await productModel.find();
+  
+  res.render('product', {products});
 });
 
 router.get('/product/crud', isAdmin , async(req, res)=>{   
@@ -23,8 +25,8 @@ router.post('/product/added',isAdmin,  upload.single('image', 5), async (req, re
   if (!req.file) {
     return res.status(400).send("Only image files are allowed!");
   }
-    let { productname, description, color, price, discount} = req.body;
-    const product = await productModel.create({productname, description, color, price, discount,
+    let { productname, description, color, price, discount, offer} = req.body;
+    const product = await productModel.create({productname, description, color, price, discount, offer,
     image:{
         data: req.file.buffer,
         contentType: req.file.mimetype

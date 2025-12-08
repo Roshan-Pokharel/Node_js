@@ -14,4 +14,12 @@ router.get('/login', (req, res) => {
 
 router.post('/login/user', loginUser);
 
+router.post('/cart/add/:id/:quantity', (req, res)=>{
+    let productId = req.params.id;
+    let quantity = req.params.quantity;
+    console.log(productId, quantity);
+
+    
+})
+
 module.exports = router;
