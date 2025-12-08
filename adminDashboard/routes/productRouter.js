@@ -2,8 +2,10 @@ const express =require('express');
 const router = express.Router();
 const upload = require('../config/multer-config');
 const productModel = require('../model/product');
+const userModel = require('../model/user');
 const isAdmin = require('../middlewares/adminMiddleware');
 const { route } = require('./userRouter');
+const isAuthenticate = require('../middlewares/authMiddleware');
 
 router.get('/product' , isAdmin, async (req, res)=>{
   const products = await productModel.find();
@@ -32,11 +34,11 @@ router.post('/product/added',isAdmin,  upload.single('image', 5), async (req, re
         contentType: req.file.mimetype
       }
     });
-    res.redirect('/product');  
+    res.redirect('/product/crud');  
 })
 
 router.post('/product/delete/:id', isAdmin ,async(req, res)=>{
-  await productModel.findOneAndDelete(req.params.id);
+  await productModel.findByIdAndDelete(req.params.id);
   res.redirect('/product/crud');
 } );
 
@@ -78,6 +80,26 @@ router.post('/product/edited/:id', isAdmin ,upload.single('image'),async(req, re
   
   
 } )
+
+    router.post('/cart/add/:id', isAuthenticate, async (req, res) => {
+  const productId = req.params.id;
+  let quantity = parseInt(req.body.quantity) || 1;
+  const user = await userModel.findById(req.user.id);
+  const item = user.orders.find(i => i.productId.toString() === productId);
+
+  if (item) {
+    item.quantity += quantity;
+  } else {
+    user.orders.push({
+      productId,
+      quantity
+    });
+  }
+
+  await user.save();
+  res.redirect('/dashboard');
+});
+
 
 
 
