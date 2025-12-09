@@ -9,12 +9,17 @@ const userSchema = new mongoose.Schema({
     },
     address: String,
     phone: String,
+    
     orders: [
   {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true
+    },
+    color:{
+      type:String,
+      default:'white'
     },
     quantity: {
       type: Number,

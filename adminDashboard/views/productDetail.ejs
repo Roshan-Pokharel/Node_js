@@ -4,7 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/stylesheet/output.css">
-  <title>Document</title>
+  <title><%= product.productname %> - Details</title>
+  <style>
+    /* Utility class for the active filter button state */
+    .filter-btn.active {
+      background-color: #4f46e5; /* indigo-600 */
+      color: white;
+      border-color: #4f46e5;
+    }
+    .hidden-review {
+        display: none !important;
+    }
+    /* Color selection active state */
+    .color-active {
+        ring-width: 2px;
+        --tw-ring-opacity: 1;
+        --tw-ring-color: rgb(79 70 229 / var(--tw-ring-opacity)); /* indigo-600 */
+        ring-offset-width: 2px; 
+    }
+  </style>
 </head>
 <body>
    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -56,11 +74,12 @@
       </div>
     </div>
   </nav>
-  <div class="max-w-xl md:max-w-5xl mx-auto px-2 py-4 md:px-4 md:py-10 grid grid-cols-2 gap-3 md:gap-12">
 
-  <div class="flex flex-col">
+  <div class="max-w-xl md:max-w-5xl mx-auto px-2 py-4 md:px-4 md:py-10 grid grid-cols-2 gap-7 md:gap-12">
 
-    <div class="relative bg-gradient-to-br from-slate-50 to-white rounded-xl p-2 md:p-8 shadow-sm border border-slate-200 flex items-center justify-center group h-40 md:h-auto">
+  <div class="flex flex-col ">
+
+    <div class="relative bg-gradient-to-br from-slate-50 to-white rounded-xl p-2 md:p-8 shadow-sm border border-slate-200 flex items-center justify-center group h-55 md:h-auto">
 
       <% if(product.offer || product.discount){ %>
         <div class="absolute top-2 left-2 z-10 flex flex-col gap-1 md:gap-2">
@@ -116,7 +135,6 @@
 
   </div>
 
-
   <div class="flex flex-col space-y-2 md:space-y-6 justify-center">
 
     <h1 class="text-lg md:text-4xl font-bold leading-tight text-slate-900">
@@ -128,13 +146,19 @@
     </p>
 
     <div class="flex items-center gap-1 md:gap-3">
-      <div class="text-yellow-400 text-xs md:text-lg">⭐⭐⭐⭐⭐</div>
-      <span class="text-[10px] md:text-sm text-slate-500"><%= product.rating %> reviews</span>
+      <div class="flex items-center text-yellow-400">
+         <% for(let i=1; i<=5; i++) { %>
+            <svg class="w-4 h-4 md:w-5 md:h-5 <%= i <= product.rating ? 'fill-current' : 'text-slate-300 fill-current' %>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+         <% } %>
+      </div>
+      <span class="text-[10px] md:text-sm text-slate-500"><%= product.reviews ? product.reviews.length : 0 %> reviews</span>
     </div>
 
     <div class="text-[10px] md:text-sm">
       <span class="text-slate-500">Brand:</span> 
-      <span class="font-medium text-slate-800"><%= product.color %></span>
+      <span class="font-medium text-slate-800"><%= product.brand || 'Generic' %></span>
     </div>
 
     <div class="flex flex-wrap items-baseline gap-1 md:gap-3">
@@ -153,24 +177,44 @@
       <% } %>
     </div>
 
-    <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 w-full pt-1 md:pt-2">
+    <% if (product.colors && product.colors.length > 0) { %>
+      <div class="mt-2">
+          <span class="text-sm font-medium text-slate-700 block mb-2">
+            Select Color: <span id="selectedColorText" class="text-slate-500 font-normal">None</span>
+          </span>
+          <div class="flex flex-wrap gap-3">
+              <% product.colors.forEach((col) => { %>
+                  <button 
+                      type="button"
+                      onclick="selectColor('<%= col %>', this)"
+                      class="color-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm focus:outline-none transition-all hover:scale-110"
+                      style="background-color: <%= col %>;"
+                      title="<%= col %>"
+                  >
+                  </button>
+              <% }) %>
+          </div>
+      </div>
+    <% } %>
+
+    <div class="flex flex-col items-start gap-2 w-full pt-1 md:pt-4">
 
       <div class="flex w-full gap-2">
         <div class="flex items-center bg-white border border-slate-200 rounded-lg shadow-sm h-8 md:h-12 w-24 md:w-36 shrink-0">
-          <button class="minusBtn w-8 md:w-12 h-full flex items-center justify-center text-slate-500 hover:text-indigo-600 cursor-pointer text-xs md:text-base" 
-                  data-id="<%= product._id %>">–</button>
-
+          <button type="button" class="minusBtn w-8 md:w-12 h-full flex items-center justify-center text-slate-500 hover:text-indigo-600 cursor-pointer text-xs md:text-base">–</button>
+          
           <input class="quantityInput w-full text-center font-semibold text-slate-700 bg-transparent text-xs md:text-base" 
-                 data-id="<%= product._id %>" value="1" readonly>
+                 value="1" readonly>
 
-          <button class="plusBtn w-8 md:w-12 h-full flex items-center justify-center text-slate-500 hover:text-indigo-600 cursor-pointer text-xs md:text-base" 
-                  data-id="<%= product._id %>">+</button>
+          <button type="button" class="plusBtn w-8 md:w-12 h-full flex items-center justify-center text-slate-500 hover:text-indigo-600 cursor-pointer text-xs md:text-base">+</button>
         </div>
 
-        <form action="/cart/add/<%= product._id %>" method="POST" class="flex-1 min-w-0">
-          <input type="hidden" name="quantity" value="1" class="hiddenQty" data-id="<%= product._id %>">
+        <form action="/cart/add/<%= product._id %>" method="POST" class="flex-1 min-w-0" onsubmit="return validateForm()">
+          
+          <input type="hidden" name="quantity" value="1" id="hiddenQty">
+          <input type="hidden" name="selectedColor"  id="hiddenColorInput">
 
-          <button class="w-full h-8 md:h-12 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] md:text-sm font-medium rounded-lg shadow-md flex items-center justify-center gap-1 md:gap-2 active:scale-[0.98] cursor-pointer whitespace-nowrap px-1">
+          <button type="submit" class="w-full h-8 md:h-12 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] md:text-sm font-medium rounded-lg shadow-md flex items-center justify-center gap-1 md:gap-2 active:scale-[0.98] cursor-pointer whitespace-nowrap px-1">
             <svg class="w-3 h-3 md:w-5 md:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 
@@ -178,34 +222,216 @@
                 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 
                 0 2 2 0 014 0z"></path>
             </svg>
-            Add
+            Add to Cart
           </button>
         </form>
       </div>
+
+      <p id="formError" class="text-red-500 text-xs font-semibold hidden">Please select a color</p>
 
     </div>
 
   </div>
 
 </div>
+  
+<div class="mt-8 border-t border-slate-200 pt-6 max-w-xl md:max-w-5xl mx-auto px-4">
+  <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+    <h2 class="text-xl font-bold text-slate-800">Customer Reviews</h2>
+    
+    <div class="flex flex-wrap gap-2" id="reviewFilters">
+      <button onclick="sortReviews('newest', this)" class="filter-btn active px-3 py-1 text-xs md:text-sm font-medium rounded-full border border-indigo-600 bg-indigo-600 text-white transition-colors">
+        Newest
+      </button>
+      <button onclick="sortReviews('oldest', this)" class="filter-btn px-3 py-1 text-xs md:text-sm font-medium rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors">
+        Oldest
+      </button>
+      <button onclick="sortReviews('highest', this)" class="filter-btn px-3 py-1 text-xs md:text-sm font-medium rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors">
+        Highest Rated
+      </button>
+      <button onclick="sortReviews('lowest', this)" class="filter-btn px-3 py-1 text-xs md:text-sm font-medium rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors">
+        Lowest Rated
+      </button>
+    </div>
+  </div>
 
-    <script src="/javascript/mobileNabBar.js"></script>
+  <div id="reviewsList" class="flex flex-col">
+    <% 
+      let reviews = product.reviews || [];
+      // Initial Sort: Sort by date descending (Newest first)
+      reviews.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+      if (reviews.length > 0) { 
+        reviews.forEach(review => { 
+    %>
+        <div class="review-item mb-4 p-4 bg-slate-50 rounded-xl shadow-sm transition-all duration-300" 
+             data-rating="<%= review.rating %>"
+             data-timestamp="<%= review.date.getTime() %>">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-slate-700"><%= review.userId ? review.userId.username : review.userName || 'Anonymous' %></span>
+            <div class="flex text-yellow-400">
+               <% for(let i=1; i<=5; i++) { %>
+                  <svg class="w-4 h-4 <%= i <= review.rating ? 'fill-current' : 'text-slate-300 fill-current' %>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                  </svg>
+               <% } %>
+            </div>
+          </div>
+          <p class="text-slate-600 mt-2"><%= review.comment %></p>
+          <span class="text-xs text-slate-400 mt-1 block"><%= review.date.toDateString() %></span>
+        </div>
+    <% 
+        }) 
+      } else { 
+    %>
+      <p class="text-slate-400" id="noReviewsMessage">No reviews yet.</p>
+    <% } %>
+  </div>
+</div>
+
+<div class="max-w-xl md:max-w-5xl mx-auto px-4 pb-10">
+    <form action="/product/<%= product._id %>/review" method="POST" class="mt-6 flex flex-col gap-3">
+        
+        <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-slate-700">Rate this product</label>
+        
+        <div class="flex flex-row-reverse justify-end w-fit">
+            <input type="radio" id="star5" name="rating" value="5" class="peer/5 hidden" required />
+            <label for="star5" class="cursor-pointer text-slate-300 peer-checked/5:text-yellow-400 hover:text-yellow-400 peer-hover/5:text-yellow-400 transition-colors">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+
+            <input type="radio" id="star4" name="rating" value="4" class="peer/4 hidden" />
+            <label for="star4" class="cursor-pointer text-slate-300 peer-checked/4:text-yellow-400 hover:text-yellow-400 peer-hover/4:text-yellow-400 peer-checked/5:text-yellow-400 peer-hover/5:text-yellow-400 transition-colors">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+
+            <input type="radio" id="star3" name="rating" value="3" class="peer/3 hidden" />
+            <label for="star3" class="cursor-pointer text-slate-300 peer-checked/3:text-yellow-400 hover:text-yellow-400 peer-hover/3:text-yellow-400 peer-checked/4:text-yellow-400 peer-hover/4:text-yellow-400 peer-checked/5:text-yellow-400 peer-hover/5:text-yellow-400 transition-colors">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+
+            <input type="radio" id="star2" name="rating" value="2" class="peer/2 hidden" />
+            <label for="star2" class="cursor-pointer text-slate-300 peer-checked/2:text-yellow-400 hover:text-yellow-400 peer-hover/2:text-yellow-400 peer-checked/3:text-yellow-400 peer-hover/3:text-yellow-400 peer-checked/4:text-yellow-400 peer-hover/4:text-yellow-400 peer-checked/5:text-yellow-400 peer-hover/5:text-yellow-400 transition-colors">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+
+            <input type="radio" id="star1" name="rating" value="1" class="peer/1 hidden" />
+            <label for="star1" class="cursor-pointer text-slate-300 peer-checked/1:text-yellow-400 hover:text-yellow-400 peer-hover/1:text-yellow-400 peer-checked/2:text-yellow-400 peer-hover/2:text-yellow-400 peer-checked/3:text-yellow-400 peer-hover/3:text-yellow-400 peer-checked/4:text-yellow-400 peer-hover/4:text-yellow-400 peer-checked/5:text-yellow-400 peer-hover/5:text-yellow-400 transition-colors">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+        </div>
+        </div>
+
+        <textarea name="comment" placeholder="Write your review here..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none h-24" required></textarea>
+        
+        <button type="submit" class="bg-indigo-600 text-white font-medium px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm w-full md:w-auto self-start">
+        Submit Review
+        </button>
+    </form>
+ </div>
+
+  <script src="/javascript/mobileNabBar.js"></script>
   <script src="/javascript/dropdown.js"></script>
   <script>
-  function swapImg(clickedThumbnail) {
-    // 1. Get the main image element
-    const mainImg = document.getElementById('mainImg');
+    // --- IMAGE SWAP ---
+    function swapImg(clickedThumbnail) {
+        const mainImg = document.getElementById('mainImg');
+        const tempSrc = mainImg.src;
+        mainImg.src = clickedThumbnail.src;
+        clickedThumbnail.src = tempSrc;
+    }
 
-    // 2. Store the current Main Image source in a temporary variable
-    const tempSrc = mainImg.src;
+    // --- QUANTITY LOGIC ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const minusBtn = document.querySelector('.minusBtn');
+        const plusBtn = document.querySelector('.plusBtn');
+        const qtyInput = document.querySelector('.quantityInput');
+        const hiddenQty = document.getElementById('hiddenQty');
 
-    // 3. Set Main Image to the Clicked Thumbnail's source
-    mainImg.src = clickedThumbnail.src;
+        if (plusBtn && minusBtn && qtyInput) {
+            plusBtn.addEventListener('click', () => {
+                let currentVal = parseInt(qtyInput.value);
+                if (currentVal < 99) { // Max limit example
+                    qtyInput.value = currentVal + 1;
+                    hiddenQty.value = currentVal + 1;
+                }
+            });
 
-    // 4. Set the Clicked Thumbnail to the old Main Image source
-    clickedThumbnail.src = tempSrc;
-  }
-</script>
-  
+            minusBtn.addEventListener('click', () => {
+                let currentVal = parseInt(qtyInput.value);
+                if (currentVal > 1) {
+                    qtyInput.value = currentVal - 1;
+                    hiddenQty.value = currentVal - 1;
+                }
+            });
+        }
+    });
+
+    // --- COLOR SELECTION LOGIC ---
+    function selectColor(color, btn) {
+        // Update Hidden Input
+        document.getElementById('hiddenColorInput').value = color;
+        
+        // Update Visual Text
+        document.getElementById('selectedColorText').textContent = color;
+        
+        // Hide Error
+        document.getElementById('formError').classList.add('hidden');
+
+        // Update Button Styling (Tailwind Ring)
+        const allBtns = document.querySelectorAll('.color-btn');
+        allBtns.forEach(b => {
+            b.classList.remove('color-active');
+            b.classList.add('border-slate-300');
+        });
+
+        // Highlight selected
+        btn.classList.remove('border-slate-300');
+        btn.classList.add('color-active');
+    }
+
+    function validateForm() {
+        const colorInput = document.getElementById('hiddenColorInput');
+        // Check if color buttons exist on the page
+        const colorBtns = document.querySelectorAll('.color-btn');
+        
+        // If there are colors to choose from, but none chosen:
+        if (colorBtns.length > 0 && !colorInput.value) {
+            document.getElementById('formError').classList.remove('hidden');
+            return false; // Stop submission
+        }
+        return true; // Allow submission
+    }
+
+    // --- SORT REVIEWS LOGIC ---
+    function sortReviews(sortType, btn) {
+        const reviewsContainer = document.getElementById('reviewsList');
+        let reviews = Array.from(reviewsContainer.querySelectorAll('.review-item'));
+
+        reviews.sort((a, b) => {
+            const ratingA = parseInt(a.getAttribute('data-rating'));
+            const ratingB = parseInt(b.getAttribute('data-rating'));
+            const timeA = parseInt(a.getAttribute('data-timestamp'));
+            const timeB = parseInt(b.getAttribute('data-timestamp'));
+
+            if (sortType === 'newest') return timeB - timeA;
+            if (sortType === 'oldest') return timeA - timeB;
+            if (sortType === 'highest') return ratingB - ratingA;
+            if (sortType === 'lowest') return ratingA - ratingB;
+            return 0;
+        });
+
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(b => {
+            b.classList.remove('active', 'bg-indigo-600', 'text-white', 'border-indigo-600');
+            b.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+        });
+        btn.classList.add('active', 'bg-indigo-600', 'text-white', 'border-indigo-600');
+        btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+
+        reviews.forEach(review => reviewsContainer.appendChild(review));
+    }
+  </script>
 </body>
 </html>
