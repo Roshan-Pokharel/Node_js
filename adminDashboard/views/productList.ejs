@@ -82,9 +82,9 @@
           
           <!-- Image -->
           <td class="px-4 py-3">
-            <% if (product.image && product.image.data) { %>
+            <% if (product.image[0] && product.image[0].data) { %>
               <img class="w-12 h-12 object-contain bg-slate-200 rounded"
-                src="data:<%= product.image.contentType %>;base64,<%= product.image.data.toString('base64') %>"
+                src="data:<%= product.image[0].contentType %>;base64,<%= product.image[0].data.toString('base64') %>"
                 alt="<%= product.productname %>">
             <% } else { %>
               <div class="w-12 h-12 bg-slate-300 rounded"></div>

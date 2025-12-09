@@ -31,12 +31,16 @@
       
       <div>
      <label class="block mb-2 text-sm font-semibold text-slate-300">Product Image</label>
-    <input class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-3 focus:border-purple-500 focus:ring-purple-500 outline-none transition cursor-pointer" type="file" name="image" />
+    <input class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-3 focus:border-purple-500 focus:ring-purple-500 outline-none transition cursor-pointer" type="file" name="image" multiple />
     </div>
+    <% if (product.image[0] && product.image[0].data) { %>
     <img class="w-12 h-12 object-contain bg-slate-200 rounded"
-      src="data:<%= product.image.contentType %>;base64,<%= product.image.data.toString('base64') %>"
+      src="data:<%= product.image[0].contentType %>;base64,<%= product.image[0].data.toString('base64') %>"
       alt="<%= product.productname %>">
     </div>
+    <% } else { %>
+       <div class="w-12 h-12 bg-slate-300 rounded"></div>
+    <% } %>
 
       <!-- Product Name --> 
       <div>
