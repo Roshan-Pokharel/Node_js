@@ -269,6 +269,101 @@ router.post("/cart/update/:id", isAuthenticate, async (req, res) => {
     res.json({ success: false });
 });
 
+router.get('/checkout', isAuthenticate, async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id).populate({
+      path: "cart.productId",
+      model: "Product"
+    });
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    if (user.cart.length === 0) {
+      return res.status(400).send("Cart is empty");
+    }
+
+    // Convert cart to orders with FIXED PRICES
+    const newOrders = user.cart.map(item => {
+      const product = item.productId;
+
+      const priceNow = product.price;                // current price
+      const discountNow = product.discount || 0;     // current discount %
+      const discountedPrice = priceNow - (priceNow * (discountNow / 100));
+
+      return {
+        productId: product._id,
+        color: item.color,
+        quantity: item.quantity,
+        status: "pending",
+        orderDate: new Date(),
+
+        // FIXED VALUES (DO NOT CHANGE LATER)
+        priceAtPurchase: priceNow,
+        discountAtPurchase: discountNow,
+        finalPrice: discountedPrice * item.quantity
+      };
+    });
+
+    // Save orders permanently
+    user.orders.push(...newOrders);
+
+    // Clear cart
+    user.cart = [];
+
+    await user.save();
+
+    res.redirect('/product/cart');
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+
+router.get('/orders', isAuthenticate, async (req, res) => {
+  const user = await userModel.findById(req.user.id)
+    .populate({
+      path: 'orders.productId',
+      model: 'Product'
+    });
+
+  let grouped = {};
+
+  user.orders.forEach(order => {
+    if (!order.productId) return;
+
+    let d = new Date(order.orderDate);
+
+    // FORMAT DATE + TIME
+    let dateKey = d.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = {
+        items: [],
+        totalCost: 0
+      };
+    }
+
+    grouped[dateKey].items.push(order);
+
+    grouped[dateKey].totalCost += order.quantity * order.productId.price;
+  });
+
+  res.render('order', { grouped });
+});
+
+
+
 
 
 

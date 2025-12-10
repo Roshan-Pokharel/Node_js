@@ -31,29 +31,18 @@ const userSchema = new mongoose.Schema({
     }
   }
 ],
-  orders: [
+orders: [
   {
-    productId: {
+    productId: { 
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: true
-    },
-    color:{
-      type:String,
-      default:'none'
-    },
-    quantity: {
-      type: Number,
-      default: 1
-    },
-    status: {
-      type: String,
-      default: "pending"
-    },
-    orderDate: {
-      type: Date,
-      default: Date.now
-    }
+       ref: "Product" },
+    color: String,
+    quantity: Number,
+    status: String,
+    orderDate: Date,
+    priceAtPurchase: Number,
+    discountAtPurchase: Number,
+    finalPrice: Number
   }
 ],
 

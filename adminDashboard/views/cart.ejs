@@ -22,7 +22,7 @@
         <div class="hidden md:flex items-center space-x-8">
           <a href="/dashboard" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Home</a>
           <a href="/categories" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Categories</a>
-          <a href="/products/order" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Orders</a>
+          <a href="/orders" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Orders</a>
           <a href="/product/cart" class="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 pb-1 ">Cart</a>
         </div>
         <div class="flex items-center space-x-4">
@@ -44,7 +44,7 @@
       <div class="px-4 pt-2 pb-4 space-y-1">
         <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Home</a>
         <a href="/categories" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Categories</a>
-        <a href="/product/order" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Order</a>
+        <a href="/orders" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Orders</a>
         <a href="/product/cart" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 bg-indigo-50">Cart</a>
         <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-red-500 hover:bg-red-50">Logout</a>
       </div>
@@ -67,7 +67,7 @@
         </div>
         <h3 class="text-xl font-medium text-slate-900">Your cart is empty</h3>
         <p class="mt-2 text-slate-500 max-w-sm mx-auto mb-10">Looks like you haven't added anything to your cart yet.</p>
-        <a href="/dashboard" class="relative mt-8 inline-flex items-center justify-center px-6 py-3  border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm">
+        <a href="/dashboard" class="relative mt-4 inline-flex items-center justify-center px-6 py-3  border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm">
           Start Shopping
         </a>
       </div>
@@ -85,9 +85,9 @@
 
             <% products.forEach((product) => { 
                 // Calculations per item
-                const originalTotal = product.price * product.quantity;
-                const discountAmount = originalTotal * (product.discount / 100);
-                const finalPrice = originalTotal - discountAmount;
+                const originalTotal =Math.floor(product.price * product.quantity);
+                const discountAmount = Math.floor(originalTotal * (product.discount / 100));
+                const finalPrice = Math.floor(originalTotal - discountAmount);
                 
                 // Add to global totals
                 subtotal += originalTotal;
@@ -111,7 +111,7 @@
                   
                   <% if(product.discount > 0) { %>
                     <span class="absolute top-0 left-0 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-br-lg">
-                      -<%= product.discount %>%
+                      -<%=product.discount %>%
                     </span>
                   <% } %>
                 </div>
@@ -158,9 +158,9 @@
 
                     <div class="text-right">
                       <% if(product.discount > 0) { %>
-                        <p class="text-xs text-slate-400 line-through mb-0.5">Rs. <%= originalTotal.toFixed(2) %></p>
+                        <p class="text-xs text-slate-400 line-through mb-0.5">Rs. <%= Math.floor(originalTotal.toFixed(2)) %></p>
                       <% } %>
-                      <p class="text-lg font-bold text-slate-900">Rs. <%= finalPrice.toFixed(2) %></p>
+                      <p class="text-lg font-bold text-slate-900">Rs. <%= Math.floor(finalPrice.toFixed(2)) %></p>
                     </div>
                   </div>
                 </div>
@@ -184,11 +184,11 @@
             <div class="space-y-4">
               <div class="flex justify-between text-slate-600">
                 <span>Subtotal</span>
-                <span>Rs. <%= subtotal.toFixed(2) %></span>
+                <span>Rs. <%= subtotal %></span>
               </div>
               <div class="flex justify-between text-green-600">
                 <span>Discount</span>
-                <span>-Rs. <%= totalDiscount.toFixed(2) %></span>
+                <span>-Rs. <%= Math.floor(totalDiscount) %></span>
               </div>
               <div class="flex justify-between text-slate-600">
                 <span>Shipping</span>
@@ -198,18 +198,16 @@
               <div class="border-t border-slate-200 pt-4 mt-4">
                 <div class="flex justify-between items-center">
                   <span class="text-base font-bold text-slate-900">Total</span>
-                  <span class="text-2xl font-bold text-indigo-600">Rs. <%= (subtotal - totalDiscount).toFixed(2) %></span>
+                  <span class="text-2xl font-bold text-indigo-600">Rs. <%= Math.floor(subtotal - totalDiscount) %></span>
                 </div>
                 <p class="text-xs text-slate-400 mt-1 text-right">Includes applicable taxes</p>
               </div>
             </div> 
 
-
-            <form action="/checkout" method="POST" class="w-full">
-                  <button class="block w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl text-center transition-all shadow-lg shadow-indigo-200 transform hover:-translate-y-0.5 cursor-pointer ">
+                  <a href="/checkout" class="block w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl text-center transition-all shadow-lg shadow-indigo-200 transform hover:-translate-y-0.5 cursor-pointer ">
                     Proceed to Checkout
-                  </button>
-                </form>
+                  </a>
+               
                 
 
             

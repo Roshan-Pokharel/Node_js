@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/stylesheet/output.css">
+  <title>Your Orders | StyleStore</title>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+  
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/dashboard">
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <span class="hidden md:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+              StyleStore
+            </span>
+          </div>
+        </a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/dashboard" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Home</a>
+          <a href="/categories" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Categories</a>
+          <a href="/orders" class="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 pb-1">Orders</a>
+          <a href="/product/cart" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Cart</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <input type="text" placeholder="Search..." class="w-48 lg:w-64 pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+            <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-semibold text-sm">U</div>
+            <a href="/logout" class="hidden md:block text-sm font-medium text-slate-500 hover:text-red-500 transition-colors">Logout</a>
+          </div>
+          <button class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg" id="mobile-menu-button">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="hidden md:hidden border-t border-slate-200 bg-white" id="mobile-menu">
+      <div class="px-4 pt-2 pb-4 space-y-1">
+        <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Home</a>
+        <a href="/categories" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Categories</a>
+        <a href="/orders" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 bg-indigo-50">Orders</a>
+        <a href="/product/cart" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Cart</a>
+        <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-red-500 hover:bg-red-50">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 mt-5 md:mt-10 pb-20">
+
+  <h1 class=" text-xl md:text-2xl font-bold text-slate-800 mb:3 md:mb-6">Your Orders</h1>
+
+  <% if (Object.keys(grouped).length === 0) { %>
+
+    <div class=" mt-4 text-center py-20 bg-white rounded-xl border border-slate-200 shadow-sm">
+      <div class="bg-slate-100 p-4 rounded-full inline-flex  mb-4">
+         <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+         </svg>
+      </div>
+      <p class="text-slate-500 text-lg">You have no orders yet.</p>
+      <a href="/dashboard" class="mt-4 inline-block px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md hover:shadow-lg">
+        Shop Now
+      </a>
+    </div>
+
+  <% } else { %>
+
+    <% Object.keys(grouped).forEach(dateTime => { %>
+
+      <!-- DATE + TIME HEADER -->
+      <div class="mb-3 mt-4 md:mt-8 flex gap-6 items-center">
+        <h2 class="text-sm md:text-xl font-semibold text-slate-700">
+          <%= dateTime %>
+        </h2>
+         <span class="text-indigo-600 font-bold text-sm  md:text-lg">
+          Total: Rs <%= grouped[dateTime].totalCost %>
+        </span>
+        
+         <a href="/order/remove>" class="text-slate-400 hover:text-rose-500 p-2 hover:bg-rose-50 rounded-lg transition-colors" title="Remove Item">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </a>
+
+       
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        
+        <% grouped[dateTime].items.forEach(order => { %>
+
+          <div class="bg-white shadow-sm rounded-xl border border-slate-200 p-5 relative hover:shadow-lg transition group">
+
+            <!-- STATUS BADGE -->
+            <% if(order.status === "pending"){ %>
+              <span class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold bg-yellow-100 text-yellow-700 rounded-full border border-yellow-200">Pending</span>
+            <% } else if(order.status === "shipped"){ %>
+              <span class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full border border-blue-200">Shipped</span>
+            <% } else if(order.status === "delivered"){ %>
+              <span class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full border border-green-200">Delivered</span>
+            <% } else { %>
+              <span class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full border border-red-200">Cancelled</span>
+            <% } %>
+
+            <!-- PRODUCT IMAGE -->
+            <div class="w-20 h-20 bg-slate-100 rounded-lg overflow-hidden mb-4">
+              <% if(order.productId.image && order.productId.image.length > 0) { %>
+                <img 
+                  src="data:<%= order.productId.image[0].contentType %>;base64,<%= order.productId.image[0].data.toString('base64') %>"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                />
+              <% } else { %>
+                <div class="flex items-center justify-center h-full text-slate-400">No Image</div>
+              <% } %>
+            </div>
+
+            <!-- PRODUCT NAME -->
+            <h2 class=" text-sm md:text-lg font-bold text-slate-800 mb-2 truncate">
+              <%= order.productId.productname %>
+            </h2>
+
+            <!-- FIXED ORDER DETAILS -->
+            <div class="space-y-1 text-sm text-slate-600">
+
+              <div class="flex justify-between">
+                <span class="font-light md:font-medium">Color:</span>
+                <span><%= order.color %></span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="font-light md:font-medium">Quantity:</span>
+                <span><%= order.quantity %></span>
+              </div>
+
+              <!-- Price at purchase -->
+              <div class="flex justify-between">
+                <span class="font-light md:font-medium">Price (then):</span>
+                <span>Rs <%= Math.floor(order.priceAtPurchase) %></span>
+              </div>
+
+              <!-- Discount at purchase -->
+              <div class="flex justify-between">
+                <span class="font-light md:font-medium">Discount:</span>
+                <span><%= Math.floor(order.discountAtPurchase) %>%</span>
+              </div>
+
+              <!-- Final cost -->
+              <div class="flex justify-between font-medium md:font-semibold text-slate-800">
+                <span>Total Cost:</span>
+                <span>Rs <%= Math.floor(order.finalPrice) %></span>
+              </div>
+
+            </div>
+
+            <!-- BUY AGAIN BUTTON -->
+            <div class="mt-5 pt-4 border-t border-slate-100">
+              <a href="/product/<%= order.productId._id %>"
+                 class="block text-center w-full bg-slate-50 text-indigo-600 font-medium py-2 rounded-lg hover:bg-indigo-600 hover:text-white border border-slate-200 hover:border-indigo-600 transition">
+                Buy Again
+              </a>
+            </div>
+
+          </div>
+
+        <% }) %>
+
+      </div>
+
+    <% }) %>
+
+  <% } %>
+
+</div>
+
+
+
+  <script src="/javascript/mobileNabBar.js"></script>
+</body>
+</html>
