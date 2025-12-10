@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/stylesheet/output.css">
+  <title>Your Shopping Cart</title>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+  
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/dashboard">
+        <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <span class="hidden md:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+              StyleStore
+            </span>
+        </div>
+        </a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/dashboard" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Home</a>
+          <a href="/categories" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Categories</a>
+          <a href="/products/order" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Orders</a>
+          <a href="/product/cart" class="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 pb-1 ">Cart</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative ">
+            <input type="text" placeholder="Search..." class="w-48 lg:w-64 pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+            <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-semibold text-sm">U</div>
+            <a href="/logout" class="hidden md:block text-sm font-medium text-slate-500 hover:text-red-500 transition-colors">Logout</a>
+          </div>
+          <button class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg" id="mobile-menu-button">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="hidden md:hidden border-t border-slate-200 bg-white" id="mobile-menu">
+      <div class="px-4 pt-2 pb-4 space-y-1">
+        <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Home</a>
+        <a href="/categories" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Categories</a>
+        <a href="/product/order" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Order</a>
+        <a href="/product/cart" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 bg-indigo-50">Cart</a>
+        <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-red-500 hover:bg-red-50">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <div class="flex items-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Shopping Cart</h1>
+        <span class="ml-3 px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-full"><%= products.length %> Items</span>
+    </div>
+
+    <% if (products.length === 0) { %>
+      <div class="text-center py-20 bg-white rounded-2xl shadow-sm border border-slate-100">
+        <div class="inline-flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 mb-6">
+          <svg class="h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-medium text-slate-900">Your cart is empty</h3>
+        <p class="mt-2 text-slate-500 max-w-sm mx-auto mb-10">Looks like you haven't added anything to your cart yet.</p>
+        <a href="/dashboard" class="relative mt-8 inline-flex items-center justify-center px-6 py-3  border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm">
+          Start Shopping
+        </a>
+      </div>
+    <% } else { %>
+      
+      <div class="flex flex-col lg:flex-row gap-8">
+        
+        <div class="lg:w-2/3">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            
+            <% 
+               let subtotal = 0; 
+               let totalDiscount = 0;
+            %>
+
+            <% products.forEach((product) => { 
+                // Calculations per item
+                const originalTotal = product.price * product.quantity;
+                const discountAmount = originalTotal * (product.discount / 100);
+                const finalPrice = originalTotal - discountAmount;
+                
+                // Add to global totals
+                subtotal += originalTotal;
+                totalDiscount += discountAmount;
+            %>
+            
+            <div class="p-6 w-full max-h-80 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
+              <div class=" flex with-auto gap-6">
+                
+                <div class="w-16 h-16 flex-shrink-0 bg-slate-50 rounded-xl overflow-hidden border border-slate-200 p-2 relative">
+                  <% if (product.image[0] && product.image[0].data) { %>
+                  <img class="w-12 h-12 object-contain bg-slate-200 rounded"
+                src="data:<%= product.image[0].contentType %>;base64,<%= product.image[0].data.toString('base64') %>"
+                alt="<%= product.productname %>">
+                  <% } else { %>
+                    <div class="h-full w-full flex flex-col items-center justify-center text-slate-400">
+                      <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      <span class="text-[10px]">No Image</span>
+                    </div>
+                  <% } %>
+                  
+                  <% if(product.discount > 0) { %>
+                    <span class="absolute top-0 left-0 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-br-lg">
+                      -<%= product.discount %>%
+                    </span>
+                  <% } %>
+                </div>
+
+                <div class="flex-1 flex flex-col justify-between">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h3 class="text-lg font-bold text-slate-900 hover:text-indigo-600 transition-colors cursor-pointer">
+                        <%= product.productname %>
+                      </h3>
+                      <p class="text-sm text-slate-500 mt-1">Price per unit: Rs. <%= product.price %></p>
+                       <p class="text-sm text-<%=product.color%>-500 mt-1"><span class="text-slate-500">Color: </span><%= product.color %></p>
+                    </div>
+                    
+                    <a href="/cart/remove/<%= product.color %>/<%= product._id %>" class="text-slate-400 hover:text-rose-500 p-2 hover:bg-rose-50 rounded-lg transition-colors" title="Remove Item">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </a>
+                  </div>
+
+                  <div class="flex items-end justify-between mt-4">
+                        <div class="flex items-center bg-slate-50 rounded-lg border border-slate-200 h-10 w-24 shrink-0">
+
+                    <button 
+                      class="minusBtn w-8 h-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-200 rounded-l-lg transition-colors cursor-pointer" 
+                      data-id="<%= product._id %>" 
+                      data-color="<%= product.color %>">
+                      -
+                    </button>
+
+                    <input 
+                      class="quantityInput w-8 bg-transparent text-center text-sm font-semibold text-slate-700 focus:outline-none" 
+                      data-id="<%= product._id %>" 
+                      data-color="<%= product.color %>"
+                      value="<%= product.quantity %>" readonly>
+
+                    <button 
+                      class="plusBtn w-8 h-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-200 rounded-r-lg transition-colors cursor-pointer" 
+                      data-id="<%= product._id %>" 
+                      data-color="<%= product.color %>">
+                      +
+                    </button>
+                  </div>
+
+
+                    <div class="text-right">
+                      <% if(product.discount > 0) { %>
+                        <p class="text-xs text-slate-400 line-through mb-0.5">Rs. <%= originalTotal.toFixed(2) %></p>
+                      <% } %>
+                      <p class="text-lg font-bold text-slate-900">Rs. <%= finalPrice.toFixed(2) %></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          
+          <div class="mt-6">
+            <a href="/dashboard" class="flex items-center text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+              Continue Shopping
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:w-1/3">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-24">
+            <h2 class="text-lg font-bold text-slate-900 mb-6">Order Summary</h2>
+            
+            <div class="space-y-4">
+              <div class="flex justify-between text-slate-600">
+                <span>Subtotal</span>
+                <span>Rs. <%= subtotal.toFixed(2) %></span>
+              </div>
+              <div class="flex justify-between text-green-600">
+                <span>Discount</span>
+                <span>-Rs. <%= totalDiscount.toFixed(2) %></span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Shipping</span>
+                <span class="text-slate-400 text-sm">Calculated at checkout</span>
+              </div>
+              
+              <div class="border-t border-slate-200 pt-4 mt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-base font-bold text-slate-900">Total</span>
+                  <span class="text-2xl font-bold text-indigo-600">Rs. <%= (subtotal - totalDiscount).toFixed(2) %></span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1 text-right">Includes applicable taxes</p>
+              </div>
+            </div> 
+
+
+            <form action="/checkout" method="POST" class="w-full">
+                  <button class="block w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl text-center transition-all shadow-lg shadow-indigo-200 transform hover:-translate-y-0.5 cursor-pointer ">
+                    Proceed to Checkout
+                  </button>
+                </form>
+                
+
+            
+            
+            <div class="mt-6 flex items-center justify-center gap-2 grayscale opacity-60">
+                <div class="h-6 w-10 bg-slate-200 rounded"></div>
+                <div class="h-6 w-10 bg-slate-200 rounded"></div>
+                <div class="h-6 w-10 bg-slate-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    <% } %>
+  </main>
+
+  <script src="/javascript/mobileNabBar.js"></script>
+  <script src="/javascript/quantity.js"></script>
+</body>
+</html>

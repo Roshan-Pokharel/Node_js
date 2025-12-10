@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     address: String,
     phone: String,
     
-    orders: [
+    cart: [
   {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +19,28 @@ const userSchema = new mongoose.Schema({
     },
     color:{
       type:String,
-      default:'white'
+      default:'none'
+    },
+    quantity: {
+      type: Number,
+      default: 1
+    },
+    orderDate: {
+      type: Date,
+      default: Date.now
+    }
+  }
+],
+  orders: [
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true
+    },
+    color:{
+      type:String,
+      default:'none'
     },
     quantity: {
       type: Number,

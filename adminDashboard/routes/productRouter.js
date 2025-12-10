@@ -115,7 +115,7 @@ router.post('/cart/add/:id', isAuthenticate, async (req, res) => {
 
     // 2. logic update: Find item by Product ID AND Color
     // If the user adds the same product but a different color, it should be a new entry
-    const item = user.orders.find(i => 
+    const item = user.cart.find(i => 
       i.productId.toString() === productId && i.color === selectedColor
     );
 
@@ -124,7 +124,7 @@ router.post('/cart/add/:id', isAuthenticate, async (req, res) => {
       item.quantity += quantity;
     } else {
       // 3. If not, push new item WITH the color field
-      user.orders.push({
+      user.cart.push({
         productId,
         quantity,
         color: selectedColor // Save the color to the schema
@@ -147,7 +147,7 @@ router.get('/product/detail/:id', isAuthenticate, async(req, res)=>{
      try {
      const product = await productModel.findById(req.params.id) .populate({ path: 'reviews.userId', select: 'username email' });
         res.render('productDetail', { product });
-    } catch (err) {
+    } catch (err) { 
         console.log(err);
         res.status(500).send("Error fetching product");
     }
@@ -191,6 +191,87 @@ router.post('/product/:id/review', isAuthenticate, async (req, res) => {
     res.status(500).send("Error adding review");
   }
 });
+
+router.get('/product/cart', isAuthenticate, async (req, res) => {
+  const user = await userModel.findById(req.user.id);
+
+  const mergedCart = {};
+
+  // Merge by product + color
+  user.cart.forEach(item => {
+    const uniqueKey = `${item.productId}-${item.color}`;
+
+    if (mergedCart[uniqueKey]) {
+      mergedCart[uniqueKey].quantity += item.quantity;
+    } else {
+      mergedCart[uniqueKey] = {
+        productId: item.productId,
+        color: item.color,
+        quantity: item.quantity
+      };
+    }
+  });
+
+  const products = [];
+
+  for (const key in mergedCart) {
+    const { productId, color, quantity } = mergedCart[key];
+    const product = await productModel.findById(productId);
+
+    if (product) {
+      products.push({
+        ...product._doc,
+        quantity,
+        color
+      });
+    }
+  }
+
+  res.render('cart', { products });
+});
+
+router.get('/cart/remove/:color/:id', isAuthenticate, async (req, res) => {
+  const color = req.params.color;
+  const productId = req.params.id;
+
+  await userModel.findByIdAndUpdate(
+    req.user.id,
+    {
+      $pull: {
+        cart: {
+          productId: productId,
+          color: color
+        }
+      }
+    }
+  );
+
+  res.redirect('/product/cart');
+});
+
+router.post("/cart/update/:id", isAuthenticate, async (req, res) => {
+    const productId = req.params.id;
+    const { color, quantity } = req.body;
+
+    const user = await userModel.findById(req.user.id);
+
+    const item = user.cart.find(
+        (i) => i.productId == productId && i.color == color
+    );
+
+    if (item) {
+        item.quantity = quantity;
+        await user.save();
+        return res.json({ success: true });
+      
+    }
+    res.redirect('/product/cart');
+    res.json({ success: false });
+});
+
+
+
+
 
 
 
