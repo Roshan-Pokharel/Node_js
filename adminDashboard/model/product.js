@@ -25,7 +25,8 @@ const productSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String
   }],
-   reviews: [reviewSchema]
+   reviews: [reviewSchema],
+   category:String
 });
 const Product = mongoose.model('Product', productSchema); 
 module.exports = Product;

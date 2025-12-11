@@ -3,12 +3,10 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    isAdmin:{
-        type:Boolean,
-        ref: 'admin'
-    },
     address: String,
-    phone: String,
+    phoneNumber: String,
+    ward:Number,
+    tole:String,
     
     cart: [
   {
@@ -43,7 +41,7 @@ orders: [
     priceAtPurchase: Number,
     discountAtPurchase: Number,
     finalPrice: Number,
-    reason:String
+   cancellationReason:String
   }
 ],
 

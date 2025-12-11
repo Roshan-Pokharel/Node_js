@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/stylesheet/output.css">
+  <title>Your Orders | StyleStore</title>
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen text-slate-800 font-sans">
+
+  <!-- NAVBAR (unchanged) -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/dashboard">
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <span class="hidden md:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+              StyleStore
+            </span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/dashboard" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Home</a>
+          <a href="/categories" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Categories</a>
+          <a href="/orders"class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Orders</a>
+          <a href="/product/cart" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Cart</a>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center gap-3">
+            <div class="h-9 w-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-semibold text-sm">U</div>
+            <a href="/logout" class="hidden md:block text-sm font-medium text-slate-500 hover:text-red-500 transition">Logout</a>
+          </div>
+
+          <button class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg" id="mobile-menu-button">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="hidden md:hidden border-t border-slate-200 bg-white" id="mobile-menu">
+      <div class="px-4 pt-2 pb-4 space-y-1">
+        <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Home</a>
+        <a href="/categories" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Categories</a>
+        <a href="/orders" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Orders</a>
+        <a href="/product/cart" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">Cart</a>
+        <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-red-500 hover:bg-red-50">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- FORM CARD -->
+  <div class="flex justify-center items-center mt-10 px-4">
+
+    <div class="bg-white/70 backdrop-blur-lg shadow-2xl rounded-2xl p-10 w-full max-w-xl border border-white/40">
+
+      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+        Complete Your Shipping Details
+      </h1>
+
+      <form action="/user/details" method="POST" class="space-y-5">
+
+        <!-- Address -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Address</label>
+          <input type="text" name="address"
+                 class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                 placeholder="Enter your address" required>
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
+          <input type="number" name="phoneNumber"
+                 class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                 placeholder="98XXXXXXXX" required>
+        </div>
+
+        <!-- Ward -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Ward No.</label>
+          <input type="number" name="ward"
+                 class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                 placeholder="Enter your ward no." required>
+        </div>
+
+        <!-- Tole -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Tole</label>
+          <input type="text" name="tole"
+                 class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                 placeholder="e.g., Kalanki, Boudha" required>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition">
+          Save Details
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="/javascript/mobileNabBar.js"></script>
+</body>
+</html>

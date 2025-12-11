@@ -37,6 +37,8 @@ router.post('/product/added', upload.array('image', 6), async (req, res) => {
       discount : req.body.discount,
       offer: req.body.offer,
       colors: colorArray,
+      category: req.body.category,
+      brand:req.body.brand,
       image: []
     });
 
@@ -83,7 +85,9 @@ router.post('/product/edited/:id', isAdmin, upload.array('image', 6), async (req
       price: req.body.price,
       rating: req.body.rating,
       discount: req.body.discount,
-      offer: req.body.offer
+      offer: req.body.offer,
+      category: req.body.category,
+      brand:req.body.brand
     };
 
     // Add uploaded images if any
@@ -194,7 +198,7 @@ router.post('/product/:id/review', isAuthenticate, async (req, res) => {
 
 router.get('/product/cart', isAuthenticate, async (req, res) => {
   const user = await userModel.findById(req.user.id);
-
+  
   const mergedCart = {};
 
   // Merge by product + color
@@ -226,8 +230,9 @@ router.get('/product/cart', isAuthenticate, async (req, res) => {
       });
     }
   }
+ const productData = await productModel.find({});
 
-  res.render('cart', { products });
+  res.render('cart', { products, productData });
 });
 
 router.get('/cart/remove/:color/:id', isAuthenticate, async (req, res) => {
@@ -275,6 +280,11 @@ router.get('/checkout', isAuthenticate, async (req, res) => {
       path: "cart.productId",
       model: "Product"
     });
+
+   if (!user.address || !user.phoneNumber || !user.ward || !user.tole) {
+  return res.render('userDetails');
+}
+
 
     if (!user) {
       return res.status(404).send("User not found");
@@ -434,7 +444,7 @@ router.post('/order/cancelled/:time', isAuthenticate, async (req, res) => {
             // If the order group time matches AND the status is pending, cancel it
             if (dateKey === time && order.status === 'pending') {
                 order.status = 'cancelled';
-                order.cancellationReason = reason; // Assuming you add this field to your user/order schema
+                order.cancellationReason = reason; 
                 cancelledCount++;
             }
         });
@@ -452,4 +462,32 @@ router.post('/order/cancelled/:time', isAuthenticate, async (req, res) => {
     }
 });
 
+router.post('/user/details', isAuthenticate, async (req, res) => {
+  try {
+    let { address, phoneNumber, ward, tole } = req.body;
+
+    // Find user
+    const user = await userModel.findById(req.user.id);
+
+    // Update user fields
+    user.address = address;
+    user.phoneNumber = phoneNumber;
+    user.ward = ward;
+    user.tole = tole;
+
+    // Save changes
+    await user.save();
+
+    res.redirect('/checkout');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Something went wrong");
+  }
+});
+
+router.get('/categories', isAuthenticate, async(req, res)=>{
+  res.render('categories');
+})
+
+ 
 module.exports = router;
