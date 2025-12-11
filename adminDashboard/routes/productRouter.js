@@ -23,7 +23,7 @@ router.get('/product/add', isAdmin, async (req, res)=>{
   res.render('productAdd');
 })
 
-router.post('/product/added', upload.array('image', 6), async (req, res) => {
+router.post('/product/added',isAdmin, upload.array('image', 6), async (req, res) => {
   try {
     let colors = req.body.color;
     let colorArray = [];
@@ -369,8 +369,10 @@ router.get('/orders', isAuthenticate, async (req, res) => {
     // FIX: Use the frozen 'finalPrice' saved at checkout instead of current price
     // finalPrice already includes the calculation (discountedPrice * quantity)
     grouped[dateKey].totalCost += order.finalPrice;
+    
   });
-  res.render('order', { grouped });
+  const productData = await productModel.find({});
+  res.render('order', { grouped, productData });
 });
 
 // Route to display the list of orders to be cancelled
