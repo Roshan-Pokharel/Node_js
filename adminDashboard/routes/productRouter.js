@@ -333,6 +333,8 @@ router.get('/orders', isAuthenticate, async (req, res) => {
   let grouped = {};
 
   user.orders.forEach(order => {
+    // Even if product is deleted later, we might still want to show order details 
+    // if you have a backup strategy, but strictly checking productId ensures we don't crash
     if (!order.productId) return;
 
     let d = new Date(order.orderDate);
@@ -353,22 +355,101 @@ router.get('/orders', isAuthenticate, async (req, res) => {
         totalCost: 0
       };
     }
-
     grouped[dateKey].items.push(order);
-
-    grouped[dateKey].totalCost += order.quantity * order.productId.price;
+    // FIX: Use the frozen 'finalPrice' saved at checkout instead of current price
+    // finalPrice already includes the calculation (discountedPrice * quantity)
+    grouped[dateKey].totalCost += order.finalPrice;
   });
-
   res.render('order', { grouped });
 });
 
+// Route to display the list of orders to be cancelled
+router.get('/order/cancel/:time', isAuthenticate, async (req, res) => {
+  const time = req.params.time;
+  
+  try {
+    const user = await userModel.findById(req.user.id)
+      .populate({
+        path: 'orders.productId',
+        model: 'Product'
+      });
+      
+    // Filter orders by the exact time string passed in the URL (dateKey used in /orders route)
+    const ordersToCancel = user.orders.filter(order => {
+        let d = new Date(order.orderDate);
+        let dateKey = d.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return dateKey === time;
+    });
 
+    if (ordersToCancel.length === 0) {
+        return res.status(404).send("No orders found for this time.");
+    }
 
+    // Only allow cancellation if ALL items are in 'pending' status
+    const allPending = ordersToCancel.every(order => order.status === 'pending');
+    if (!allPending) {
+        return res.status(400).send("Cancellation failed: Some items have already been shipped or delivered.");
+    }
 
+    res.render('orderCancel', { 
+        orders: ordersToCancel, 
+        orderTime: time 
+    });
 
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching orders for cancellation.");
+  }
+});
 
+// Route to handle the cancellation logic (POST request)
+router.post('/order/cancelled/:time', isAuthenticate, async (req, res) => {
+    const time = req.params.time;
+    const { reason } = req.body;
 
+    try {
+        const user = await userModel.findById(req.user.id);
+        
+        let cancelledCount = 0;
+        
+        // Use the same date formatting logic to find the orders by group time
+        user.orders.forEach(order => {
+            let d = new Date(order.orderDate);
+            let dateKey = d.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
 
+            // If the order group time matches AND the status is pending, cancel it
+            if (dateKey === time && order.status === 'pending') {
+                order.status = 'cancelled';
+                order.cancellationReason = reason; // Assuming you add this field to your user/order schema
+                cancelledCount++;
+            }
+        });
 
+        if (cancelledCount === 0) {
+            return res.redirect('/orders'); // Nothing was cancelled, maybe already shipped
+        }
+
+        await user.save();
+        res.redirect('/orders');
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error processing cancellation.");
+    }
+});
 
 module.exports = router;

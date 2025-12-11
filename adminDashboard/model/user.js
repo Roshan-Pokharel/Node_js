@@ -42,7 +42,8 @@ orders: [
     orderDate: Date,
     priceAtPurchase: Number,
     discountAtPurchase: Number,
-    finalPrice: Number
+    finalPrice: Number,
+    reason:String
   }
 ],
 

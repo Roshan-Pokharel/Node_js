@@ -11,6 +11,7 @@ const reviewSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now }
 });
 
+
 const productSchema = new mongoose.Schema({
     productname: { type: String, required: true, unique: true },
     rating:Number,
