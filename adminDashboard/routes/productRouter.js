@@ -490,9 +490,29 @@ router.post('/user/details', isAuthenticate, async (req, res) => {
   }
 });
 
-router.get('/categories', isAuthenticate, async(req, res)=>{
-  res.render('categories');
-})
+router.get('/categories/:category', isAuthenticate, async (req, res) => {
+  try {
+    const category = req.params.category;
+
+    // Find all products that match this category
+    const products = await productModel.find({ category: category });
+
+    if (!products.length) {
+      return res.render('categories', { products: [], category });
+    }
+    const user = await userModel.findById(req.user.id);
+      const totalQuantity = new Set(
+        user.cart.map(item => item.productId.toString() + "-" + item.color)
+      ).size;
+      const productData = await productModel.find({});
+    res.render('categories', { products, category , totalQuantity, productData});
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+});
+
 
  
 module.exports = router;
