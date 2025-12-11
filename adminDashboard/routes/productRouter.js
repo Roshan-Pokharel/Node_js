@@ -372,7 +372,10 @@ router.get('/orders', isAuthenticate, async (req, res) => {
     
   });
   const productData = await productModel.find({});
-  res.render('order', { grouped, productData });
+   const totalQuantity = new Set(
+    user.cart.map(item => item.productId.toString() + "-" + item.color)
+  ).size;
+  res.render('order', { grouped, productData , totalQuantity});
 });
 
 // Route to display the list of orders to be cancelled

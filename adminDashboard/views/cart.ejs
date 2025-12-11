@@ -9,14 +9,18 @@
 <body class="bg-gray-50 font-sans text-slate-800">
 
   <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/dashboard" class="flex items-center gap-3 group">
-          <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">S</div>
-          <span class="hidden md:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">StyleStore</span>
+        <a href="/dashboard">
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <span class="hidden md:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+              StyleStore
+            </span>
+          </div>
         </a>
         
-        <div class="hidden md:flex items-center gap-8 mr-65">
+        <div class="hidden md:flex items-center gap-8 mr-71">
           <a href="/dashboard" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">Home</a>
            <div class="relative group"> 
     <button id="catBtn" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-1 transition-colors cursor-pointer">
@@ -43,9 +47,9 @@
     </div>
     </div>
           <a href="/orders" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">Orders</a>
-          <a href="/product/cart" class="text-sm font-medium text-indigo-600 flex items-center gap-1">
+          <a href="/product/cart"  class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
             Cart
-            <span class="bg-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full"><%= products.length %></span>
+            <span class="absolute bg-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-1 top-5 ml-1 rounded-full"><%= products.length %></span>
           </a>
         </div>
 

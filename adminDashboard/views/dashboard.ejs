@@ -40,7 +40,7 @@
                 <a href="/dashboard">
                     <div class="flex items-center gap-3">
                         <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
-                        <span class="text-xl font-bold tracking-tight text-slate-900">StyleStore</span>
+                        <span class="hidden md:block text-xl font-bold bg-clip-text text-violet-600 ">StyleStore</span>
                     </div>
                 </a>
             </div>
@@ -51,7 +51,7 @@
                     Home
                 </a>
 
-                <div class="relative group"> <button id="catBtn" class="text-sm font-medium text-slate-700 hover:text-indigo-600 flex items-center gap-1">
+                <div class="relative group"> <button id="catBtn" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-1">
                         Categories
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
@@ -71,17 +71,17 @@
                     </div>
                 </div>
 
-                <a href="/orders" class="text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors">
+                <a href="/orders" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
                     Orders
                 </a>
-              <a href="/product/cart" class="text-sm font-medium text-indigo-600 flex items-center gap-1">
+              <a href="/product/cart" class="text-sm font-medium text-slate-500 flex items-center gap-1">
             Cart
-            <span class="bg-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full"><%= totalQuantity %></span>
+            <span class="bg-indigo-100 text-slate-500 text-[10px] font-bold px-2 py-px rounded-full"><%= totalQuantity %></span>
           </a>
             </div>
 
             <div class="flex items-center space-x-4">
-                <div class="relative hidden sm:block"> <input type="text" placeholder="Search..." class="w-48 lg:w-64 pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                <div class="relative "> <input type="text" placeholder="Search..." class="w-48 lg:w-64 pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
                     <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
 
@@ -110,7 +110,7 @@
 
   <main class="container mx-auto px-4 py-8">
     
-    <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
       <div>
         <h1 class="text-2xl font-bold text-slate-900">Featured Products</h1>
         <p class="text-slate-500 mt-1">Check out our latest collection</p>

@@ -304,6 +304,9 @@
   .top-2\.5 {
     top: calc(var(--spacing) * 2.5);
   }
+  .top-3 {
+    top: calc(var(--spacing) * 3);
+  }
   .top-4 {
     top: calc(var(--spacing) * 4);
   }
@@ -394,8 +397,14 @@
       max-width: 96rem;
     }
   }
+  .m-1 {
+    margin: calc(var(--spacing) * 1);
+  }
   .m-4 {
     margin: calc(var(--spacing) * 4);
+  }
+  .m-10 {
+    margin: calc(var(--spacing) * 10);
   }
   .-mx-2 {
     margin-inline: calc(var(--spacing) * -2);
@@ -471,6 +480,15 @@
   }
   .mr-70 {
     margin-right: calc(var(--spacing) * 70);
+  }
+  .mr-71 {
+    margin-right: calc(var(--spacing) * 71);
+  }
+  .mr-72 {
+    margin-right: calc(var(--spacing) * 72);
+  }
+  .mr-75 {
+    margin-right: calc(var(--spacing) * 75);
   }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
@@ -1253,6 +1271,18 @@
   .py-24 {
     padding-block: calc(var(--spacing) * 24);
   }
+  .py-\[0\.5px\] {
+    padding-block: 0.5px;
+  }
+  .py-\[1px\] {
+    padding-block: 1px;
+  }
+  .py-\[5px\] {
+    padding-block: 5px;
+  }
+  .py-px {
+    padding-block: 1px;
+  }
   .pt-1 {
     padding-top: calc(var(--spacing) * 1);
   }
@@ -1469,6 +1499,9 @@
   }
   .text-transparent {
     color: transparent;
+  }
+  .text-violet-600 {
+    color: var(--color-violet-600);
   }
   .text-white {
     color: var(--color-white);
