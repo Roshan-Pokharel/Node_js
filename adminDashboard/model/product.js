@@ -26,7 +26,8 @@ const productSchema = new mongoose.Schema({
     contentType: String
   }],
    reviews: [reviewSchema],
-   category:String
+   category:String,
+   tag: [{ type: String }]
 });
 const Product = mongoose.model('Product', productSchema); 
 module.exports = Product;

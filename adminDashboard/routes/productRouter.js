@@ -30,6 +30,11 @@ router.post('/product/added',isAdmin, upload.array('image', 6), async (req, res)
     if (colors) {
     colorArray = colors.split(',').map(color => color.trim());
     }
+    let tags = req.body.tag;
+    let tagArray = [];
+    if (tags) {
+    tagArray = tags.split(',').map(tag => tag.trim());
+    }
     const product = new productModel({
       productname: req.body.productname,
       description: req.body.description,
@@ -39,6 +44,7 @@ router.post('/product/added',isAdmin, upload.array('image', 6), async (req, res)
       colors: colorArray,
       category: req.body.category,
       brand:req.body.brand,
+      tag:tagArray,
       image: []
     });
 
@@ -77,17 +83,30 @@ router.get('/product/edit/:id', isAdmin ,async(req, res)=>{
 router.post('/product/edited/:id', isAdmin, upload.array('image', 6), async (req, res) => {
   const productId = req.params.id;
 
+   let tags = req.body.tag;
+    let tagArray = [];
+    if (tags) {
+    tagArray = tags.split(',').map(tag => tag.trim());
+    }
+
+    let colors = req.body.color;
+    let colorArray = [];
+    if (colors) {
+    colorArray = colors.split(',').map(color => color.trim());
+    }
+
   try {
     const updateData = {
       productname: req.body.productname,
       description: req.body.description,
-      color: req.body.color,
+      colors: colorArray,
       price: req.body.price,
       rating: req.body.rating,
       discount: req.body.discount,
       offer: req.body.offer,
       category: req.body.category,
-      brand:req.body.brand
+      brand:req.body.brand,
+      tag:tagArray
     };
 
     // Add uploaded images if any
@@ -150,7 +169,40 @@ router.get('/product/order',isAdmin, (req, res)=>{
 router.get('/product/detail/:id', isAuthenticate, async(req, res)=>{
      try {
      const product = await productModel.findById(req.params.id) .populate({ path: 'reviews.userId', select: 'username email' });
-        res.render('productDetail', { product });
+  const user = await userModel.findById(req.user.id);
+  const productData = await productModel.find({});
+   const totalQuantity = new Set(
+    user.cart.map(item => item.productId.toString() + "-" + item.color)
+  ).size;
+
+  
+    const relatedProducts = await productModel.aggregate([
+      {
+        $match: {
+          _id: { $ne: product._id },   // exclude the current product
+          tag: { $in: product.tag }    // at least 1 matching tag
+        }
+      },
+      {
+        // Count how many tags are similar
+        $addFields: {
+          tagMatchCount: {
+            $size: { $setIntersection: ["$tag", product.tag] }
+          }
+        }
+      },
+      {
+        // Keep only products that share 2+ tags
+        $match: {
+          tagMatchCount: { $gte: 2 }
+        }
+      },
+      {
+        $sort: { tagMatchCount: -1 }   // optional: sort by most similar
+      },
+      { $limit: 10 }                   // show max 10 related products
+    ]);
+        res.render('productDetail', { product , productData, totalQuantity, relatedProducts});
     } catch (err) { 
         console.log(err);
         res.status(500).send("Error fetching product");
@@ -489,6 +541,7 @@ router.post('/user/details', isAuthenticate, async (req, res) => {
     res.status(500).send("Something went wrong");
   }
 });
+
 
 router.get('/categories/:category', isAuthenticate, async (req, res) => {
   try {
