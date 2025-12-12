@@ -29,7 +29,7 @@ module.exports.registerAdmin = async (req, res) => {
              const newAdmin = await adminModel.create({ username, password:hash, email });
               const token = await  jwt.sign({email, id:newAdmin._id}, adminsecretkey , {expiresIn:'7d'});
                 res.cookie('adminAuthToken', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); 
-                res.redirect('/admindashboard');  
+                res.redirect('/admindomain');  
                 }
                 catch(err){
                     console.error(err);
@@ -132,7 +132,7 @@ module.exports.loginUser =  async (req, res) => {
                     return res.status(500).send("Internal Server Error");
                 }
                 res.cookie('adminAuthToken', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); 
-                res.redirect('/admindashboard'); 
+                res.redirect('/admindomain'); 
             }); 
             } catch(err){
                 console.error(err);

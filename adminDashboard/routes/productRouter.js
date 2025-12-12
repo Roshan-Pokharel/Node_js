@@ -8,9 +8,9 @@ const { route } = require('./userRouter');
 const isAuthenticate = require('../middlewares/authMiddleware');
  const getProduct = require('../utils/getProduct');
 
-router.get('/product' , isAdmin, async (req, res)=>{
+router.get('/admindomain' , isAdmin, async (req, res)=>{
   const products = await productModel.find();
-  res.render('product', {products});
+  res.render('adminDomain', {products});
 });
 
 router.get('/product/crud', isAdmin , async(req, res)=>{   
