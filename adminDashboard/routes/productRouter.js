@@ -566,6 +566,38 @@ router.get('/categories/:category', isAuthenticate, async (req, res) => {
   }
 });
 
+router.post('/product/search', isAuthenticate, async (req, res) => {
+  try {
+    const searchItem = req.body.search.trim();
+    const user = await userModel.findById(req.user.id);
+    const totalQuantity = new Set(
+    user.cart.map(item => item.productId.toString() + "-" + item.color)
+  ).size;
+    // If empty search
+    if (!searchItem) {
+      return res.render('search', { products: [], searchItem });
+    }
+
+    const products = await productModel.find({
+      $or: [
+        { productname: { $regex: searchItem, $options: "i" } }, // partial match
+        { category: { $regex: searchItem, $options: "i" } },    // partial match
+        { tag: { $in: [ new RegExp(searchItem, "i") ] } }       // tag match
+      ]
+    });
+
+    res.render('search', {
+      products,
+      searchItem, totalQuantity
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error searching products");
+  }
+});
+
+
 
  
 module.exports = router;
