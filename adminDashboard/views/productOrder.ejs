@@ -1,51 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/stylesheet/output.css" />
-  <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <link rel="stylesheet" href="/stylesheet/output.css" />
+  <title>Admin Order Panel</title>
 </head>
-<body class=" bg-slate-900 text-white font-medium overflow-x-hidden">
 
-  <!-- Header -->
-  <header class="flex items-center justify-between px-8 py-5 border-b border-slate-800 "> 
-    <h1 class="md:text-2xl text-xl  font-bold tracking-wide ">Product Order</h1>
+<body class= " bg-slate-900 text-white font-medium overflow-x-hidden">
+
+<!-- HEADER -->
+ <header class="flex items-center justify-between px-8 py-5 border-b border-slate-800 "> 
+    <a href="/product/order"><h1 class="md:text-2xl text-xl  font-bold tracking-wide cursor-pointer">Product Orders</h1></a>
 
  <!-- Search section start from here  -->
-    <div class="absolute md:right-70 right-18 ">
+      <div class="relative  md:right-30"> 
+      <form action="/user/searchAdmin" method="post">
         <input type="text" placeholder="Search products..." 
-               class="w-64 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+               class="w-64 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" name="search">
         <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"/>
           </svg>
         </button>
+     </form>
       </div>
 
     <a href="/admindomain"
-      class=" hidden md:block bg-purple-600 hover:bg-purple-700 active:scale-95 transition  text-white md:px-4 md:py-2 py-1 px-1 rounded-md shadow-md md:absolute  md:right-40 top-5">
+      class=" hidden md:block bg-purple-600 hover:bg-purple-700 active:scale-95 transition  text-white md:px-4 md:py-2 py-1 px-1 rounded-md shadow-md md:absolute  md:right-10 top-5">
       Go Back
     </a>
 
-    <a href="/product/add"
-      class=" hidden md:block bg-purple-600 hover:bg-purple-700 active:scale-95 transition text-white px-1 py-1 md:px-2 md:py-2 rounded-md shadow-md ">
-      Add Product
-    </a>
 
 <!-- Mobile Menu Button -->
 <button class="md:hidden  text-gray-700 focus:outline-none" id="mobile-menu-product">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" 
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
        viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 6h16M4 12h16M4 18h16"/>
   </svg>
 </button>
+
 <!-- Mobile Menu -->
    <div class="hidden md:hidden absolute right-5 top-15 bg-slate-400" id="mobile-product">
     <a href="/product/add" class="block px-6 py-2  text-gray-800 hover:bg-slate-300">Add Product</a>
     <a href="/admindomain" class="block px-6 py-2 text-gray-800 hover:bg-slate-300">Back</a>
   </div>
+
+
+
+
   </header>
-    
+
+<main class="max-w-6xl mx-auto p-6">
+
+<!-- FILTER TABS -->
+<div class="mb-8 flex flex-wrap  gap-10 p-2 bg-slate-900 rounded-xl border border-slate-800">
+  <button onclick="filterOrders('all', this)" class="tab-btn active cursor-pointer ml-5 " data-status-filter="all">All</button>
+  <button onclick="filterOrders('pending', this)" class="tab-btn cursor-pointer">Pending</button>
+  <button onclick="filterOrders('shipped', this)" class="tab-btn cursor-pointer">Shipped</button>
+  <button onclick="filterOrders('delivered', this)" class="tab-btn cursor-pointer">Delivered</button>
+  <button onclick="filterOrders('cancelled', this)" class="tab-btn cursor-pointer">Cancelled</button>
+</div>
+
+<!-- ORDER LIST -->
+<div id="orderList" class="space-y-10">
+
+<% users.forEach(user => { 
+  let grouped = {};
+  user.orders.forEach(order => {
+    const key = new Date(order.orderDate).getTime();
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(order);
+  });
+%>
+
+<% Object.keys(grouped).reverse().forEach(time => { 
+  const batch = grouped[time];
+  const batchStatus = batch[0].status;
+  let batchTotal = 0;
+  batch.forEach(i => batchTotal += i.finalPrice);
+%>
+
+<!-- ORDER CARD -->
+<div class="order-card bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl"
+     data-status="<%= batchStatus %>">
+
+<!-- HEADER -->
+<div class="px-6 py-4 bg-slate-800/40 border-b border-slate-800 flex justify-between items-center gap-4">
+
+  <div>
+    <h3 class="font-bold text-2xl text-white"><%= user.username %></h3>
+    <p class="text-lg text-slate-400">
+       <%= user.email %> |  <%= user.phoneNumber || 'N/A' %>
+    </p>
+  </div>
+
+  <div class="text-right">
+    <p class="text-[10px] uppercase font-bold text-slate-500">Order Time</p>
+    <p class="text-sm text-slate-300"><%= new Date(Number(time)).toLocaleString() %></p>
+  </div>
+
+</div>
+
+<!-- GROUP ACTION BAR -->
+<div class="px-6 py-4 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center">
+
+<span class="px-2 py-1 text-[14px]  uppercase rounded-2xl
+  <%= batchStatus === 'pending' ? 'bg-yellow-950 text-yellow-400 border border-yellow-900' :
+      batchStatus === 'shipped' ? 'bg-blue-950 text-blue-400 border border-blue-900' :
+      batchStatus === 'delivered' ? 'bg-green-950 text-green-400 border border-green-900' :
+      'bg-red-950 text-red-400 border border-red-900' %>">
+  <%= batchStatus %>
+</span>
+
+<form action="/admin/order/update-group/<%= user._id %>" method="POST" class="flex gap-2">
+  <input type="hidden" name="orderTime" value="<%= time %>">
+
+  <% if(batchStatus === 'pending') { %>
+    <button name="status" value="shipped" class="btn-ship cursor-pointer text-slate-250 px-3 py-1 rounded-xl bg-blue-400">Ship</button>
+    <button name="status" value="cancelled" class="btn-cancel cursor-pointer text-slate-250 px-3 py-1 rounded-xl bg-red-400">Cancel</button>
+  <% } else if(batchStatus === 'shipped') { %>
+    <button name="status" value="delivered" class="btn-deliver cursor-pointer text-slate-250 px-3 py-1 rounded-xl bg-green-400">Deliver</button>
+  <% } %>
+</form>
+
+</div>
+
+<!-- PRODUCTS -->
+<div class="p-5 space-y-4">
+
+<% batch.forEach(item => { %>
+
+<div class="grid grid-cols-[auto_1fr_auto] gap-4 p-4 rounded-2xl
+            bg-gradient-to-br from-slate-850 to-slate-900
+            border border-slate-800">
+
+<!-- IMAGE -->
+<div class="w-16 h-16 rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+  <% if (item.productId && item.productId.image?.length) { %>
+    <img class="w-full h-full object-cover"
+      src="data:<%= item.productId.image[0].contentType %>;base64,<%= item.productId.image[0].data.toString('base64') %>">
+  <% } else { %>
+    <div class="w-full h-full flex items-center justify-center text-xs text-slate-500">No Image</div>
+  <% } %>
+</div>
+
+<!-- INFO -->
+<div>
+  <p class="text-sm  text-white">
+    <%= item.productId ? item.productId.productname : 'Deleted Product' %>
+  </p>
+  <p class="text-xs text-slate-400 mt-1">
+    Qty <%= item.quantity %> · Color <%= item.color || 'N/A' %>
+  </p>
+</div>
+
+<!-- PRICE -->
+<div class="text-right">
+  <p class="text-sm  text-white">Rs. <%= item.finalPrice %></p>
+</div>
+
+</div>
+
+<% }) %>
+</div>
+
+<!-- FOOTER -->
+<div class="px-6 py-4 bg-slate-800/30 border-t border-slate-800 flex justify-between items-end">
+
+<div>
+  <p class="text-[20px] uppercase font-bold text-slate-500">Shipping Address</p>
+  <p class="text-[15px] text-slate-400 max-w-sm">
+    <%= user.address %>, Ward <%= user.ward %>, <%= user.tole %>
+  </p>
+</div>
+
+<div class="text-right">
+  <p class="text-[13px] uppercase font-bold text-slate-500">Total</p>
+  <p class="text-2xl font-black text-slate-400">Rs. <%= Math.floor(batchTotal) %></p>
+</div>
+
+</div>
+
+</div>
+
+<% }) %>
+<% }) %>
+
+</div>
+</main>
+
+<!-- STYLES -->
+<style>
+.tab-btn { @apply px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white transition }
+.tab-btn.active { @apply bg-blue-600 text-white }
+
+.btn-ship { @apply px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-black uppercase }
+.btn-cancel { @apply px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl text-xs font-black uppercase }
+.btn-deliver { @apply px-4 py-2 bg-green-600 hover:bg-green-500 rounded-xl text-xs font-black uppercase }
+
+.order-card.hidden { display: none }
+</style>
+
+<!-- FILTER SCRIPT -->
+<script>
+const cards = document.querySelectorAll('.order-card');
+const tabs = document.querySelectorAll('.tab-btn');
+
+function filterOrders(status, el) {
+  tabs.forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  cards.forEach(card => {
+    card.classList.toggle('hidden',
+      status !== 'all' && card.dataset.status !== status
+    );
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  filterOrders('all', document.querySelector('[data-status-filter="all"]'));
+});
+</script>
+
 </body>
 </html>

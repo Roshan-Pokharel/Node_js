@@ -15,7 +15,8 @@ router.get('/admindomain' , isAdmin, async (req, res)=>{
 
 router.get('/product/crud', isAdmin , async(req, res)=>{   
   const products = await productModel.find();
-    res.render('productList', {products});
+   const productData = await productModel.find();
+    res.render('productList', {products, productData});
 } )
 
 router.get('/product/add', isAdmin, async (req, res)=>{
@@ -162,9 +163,54 @@ router.post('/cart/add/:id', isAuthenticate, async (req, res) => {
   }
 });
 
-router.get('/product/order',isAdmin, (req, res)=>{
-    res.render('productOrder');
+router.get('/product/order',isAdmin, async(req, res)=>{
+  const users = await userModel.find().populate('orders.productId');
+    res.render('productOrder', {users});
 })
+
+// Add this route to productRouter.js to handle status updates
+router.post('/admin/order/update/:userId/:orderId', isAdmin, async (req, res) => {
+    try {
+        const { userId, orderId } = req.params;
+        const { status } = req.body;
+
+        const user = await userModel.findById(userId);
+        if (!user) return res.status(404).send("User not found");
+
+        const order = user.orders.id(orderId);
+        if (!order) return res.status(404).send("Order not found");
+
+        order.status = status;
+        
+        // If admin cancels, you could optionally add a default reason
+        if (status === 'cancelled') {
+            order.cancellationReason = "Cancelled by Admin";
+        }
+
+        await user.save();
+        res.redirect('/product/order');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error updating order status");
+    }
+});
+
+router.post('/admin/order/update-group/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { status, orderTime } = req.body;
+
+  const user = await User.findById(userId);
+
+  user.orders.forEach(order => {
+    if (new Date(order.orderDate).getTime() === Number(orderTime)) {
+      order.status = status;
+    }
+  });
+
+  await user.save();
+  res.redirect('back');
+});
+
 
 router.get('/product/detail/:id', isAuthenticate, async(req, res)=>{
      try {
@@ -566,6 +612,26 @@ router.get('/categories/:category', isAuthenticate, async (req, res) => {
   }
 });
 
+router.get('/product/:category', isAdmin, async (req, res) => {
+  try {
+    const category = req.params.category;
+
+    // Find all products that match this category
+    const products = await productModel.find({ category: category });
+
+    const productData = await productModel.find();
+
+    if (!products.length) {
+      return res.render('categories', { products: [], category });
+    }
+    res.render('productcategories', { products, category, productData});
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+});
+
 router.post('/product/search', isAuthenticate, async (req, res) => {
   try {
     const searchItem = req.body.search.trim();
@@ -590,6 +656,59 @@ router.post('/product/search', isAuthenticate, async (req, res) => {
       products,
       searchItem, totalQuantity
     });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error searching products");
+  }
+});
+
+router.post('/product/searchAdmin', isAdmin, async (req, res) => {
+  try {
+    const searchItem = req.body.search.trim();
+    // If empty search
+    if (!searchItem) {
+      return res.render('search', { products: [], searchItem });
+    }
+    
+    const productData = await productModel.find();
+
+    const products = await productModel.find({
+      $or: [
+        { productname: { $regex: searchItem, $options: "i" } }, // partial match
+        { category: { $regex: searchItem, $options: "i" } },    // partial match
+        { tag: { $in: [ new RegExp(searchItem, "i") ] } }       // tag match
+      ]
+    });
+
+    res.render('searchItemList', {
+      products,
+      searchItem, productData
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error searching products");
+  }
+});
+
+router.post('/user/searchAdmin', isAdmin, async (req, res) => {
+  try {
+    const searchUser = req.body.search.trim();
+    // If empty search
+    if (!searchUser) {
+      return res.render('search', { user: [], searchUser});
+    }
+    
+    const users = await userModel.find({
+      $or: [
+        { username: { $regex: searchUser, $options: "i" } }, // partial match
+        { email: { $regex: searchUser, $options: "i" } },    // partial match
+        { address: { $regex: searchUser, $options: "i" }}       // tag match
+      ]
+    }).populate('orders.productId');
+
+    res.render('productOrder', {users});
 
   } catch (err) {
     console.error(err);
