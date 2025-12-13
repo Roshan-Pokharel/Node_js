@@ -10,7 +10,16 @@ const isAuthenticate = require('../middlewares/authMiddleware');
 
 router.get('/admindomain' , isAdmin, async (req, res)=>{
   const products = await productModel.find();
-  res.render('adminDomain', {products});
+  let users = await userModel.find();
+   let NewOrder = 0;
+  users.forEach((user)=>{
+    user.orders.forEach((order)=>{
+      if(order.status === 'pending'){
+        NewOrder = NewOrder + 1;
+      }
+    })
+  })
+  res.render('adminDomain', {products, NewOrder});
 });
 
 router.get('/product/crud', isAdmin , async(req, res)=>{   
@@ -164,7 +173,8 @@ router.post('/cart/add/:id', isAuthenticate, async (req, res) => {
 });
 
 router.get('/product/order',isAdmin, async(req, res)=>{
-  const users = await userModel.find().populate('orders.productId');
+  const users = (await userModel.find().populate('orders.productId')).reverse();
+ 
     res.render('productOrder', {users});
 })
 
@@ -195,11 +205,11 @@ router.post('/admin/order/update/:userId/:orderId', isAdmin, async (req, res) =>
     }
 });
 
-router.post('/admin/order/update-group/:userId', async (req, res) => {
+router.post('/admin/order/update-group/:userId',isAdmin , async (req, res) => {
   const { userId } = req.params;
   const { status, orderTime } = req.body;
 
-  const user = await User.findById(userId);
+  const user = await userModel.findById(userId);
 
   user.orders.forEach(order => {
     if (new Date(order.orderDate).getTime() === Number(orderTime)) {
@@ -208,7 +218,7 @@ router.post('/admin/order/update-group/:userId', async (req, res) => {
   });
 
   await user.save();
-  res.redirect('back');
+  res.redirect('/product/order');
 });
 
 
@@ -713,6 +723,127 @@ router.post('/user/searchAdmin', isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error searching products");
+  }
+});
+
+// ... imports
+// router.get('/analysis' ... -> REPLACE THAT ENTIRE ROUTE WITH THIS:
+
+router.get('/analysis', isAdmin, async (req, res) => {
+  try {
+    const range = req.query.range || 'all'; // Get filter from URL (default: all)
+    
+    // 1. Calculate the cutoff date based on the filter
+    let cutoffDate = new Date(0); // Default to beginning of time
+    const now = new Date();
+    
+    if (range === '7') {
+      cutoffDate.setDate(now.getDate() - 7);
+    } else if (range === '30') {
+      cutoffDate.setDate(now.getDate() - 30);
+    } else if (range === 'year') {
+      cutoffDate.setFullYear(now.getFullYear(), 0, 1); // Start of this year
+    }
+
+    const users = await userModel.find({}).populate('orders.productId');
+
+    // --- DATA CONTAINERS ---
+    let salesByDate = {};       
+    let productSales = {};      
+    let salesByDay = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    let cancelReasons = {};     
+    let customerType = { new: 0, returning: 0 };
+
+    users.forEach(user => {
+      // Filter user's orders by date first
+      const relevantOrders = user.orders.filter(o => new Date(o.orderDate) >= cutoffDate);
+      
+      // Skip user entirely if they have no relevant orders in this period
+      if (relevantOrders.length === 0) return;
+
+      // Loyalty Check (based on total history or just this period? Usually total history is better for 'Loyalty')
+      // But here we check behavior within the selected timeframe
+      const validOrders = relevantOrders.filter(o => o.status !== 'cancelled');
+      if (validOrders.length === 1) customerType.new++;
+      if (validOrders.length > 1) customerType.returning++;
+
+      relevantOrders.forEach(order => {
+        if (order.status === 'cancelled') {
+          // Normalize text: "Changed mind" and "changed mind" should be same
+          const reason = (order.cancellationReason || 'Unknown').trim().toLowerCase();
+          // Capitalize first letter for display
+          const displayReason = reason.charAt(0).toUpperCase() + reason.slice(1);
+          cancelReasons[displayReason] = (cancelReasons[displayReason] || 0) + 1;
+        } 
+        else {
+           // 1. Sales Trend
+           const dateKey = order.orderDate.toISOString().split('T')[0];
+           salesByDate[dateKey] = (salesByDate[dateKey] || 0) + order.finalPrice;
+
+           // 2. Best Selling Product
+           if (order.productId) {
+             const pName = order.productId.productname;
+             productSales[pName] = (productSales[pName] || 0) + order.quantity;
+           }
+
+           // 3. Best Day
+           const dayIndex = new Date(order.orderDate).getDay();
+           salesByDay[dayIndex] += order.finalPrice;
+        }
+      });
+    });
+
+    // --- SMART GROUPING FOR CANCELLATIONS ---
+    // Problem: If 50 people type different reasons, chart breaks.
+    // Solution: Keep top 4 reasons, group rest as "Others".
+    let sortedReasons = Object.entries(cancelReasons).sort((a, b) => b[1] - a[1]);
+    let finalCancelLabels = [];
+    let finalCancelData = [];
+
+    if (sortedReasons.length > 5) {
+      // Take top 4
+      const top4 = sortedReasons.slice(0, 4);
+      // Sum the rest
+      const othersCount = sortedReasons.slice(4).reduce((sum, item) => sum + item[1], 0);
+      
+      top4.forEach(item => {
+        finalCancelLabels.push(item[0]);
+        finalCancelData.push(item[1]);
+      });
+      // Push "Others"
+      finalCancelLabels.push("Others (Misc)");
+      finalCancelData.push(othersCount);
+    } else {
+      // If small number of reasons, just show them all
+      finalCancelLabels = sortedReasons.map(x => x[0]);
+      finalCancelData = sortedReasons.map(x => x[1]);
+    }
+
+    // --- OTHER FORMATTING ---
+    const sortedDates = Object.keys(salesByDate).sort();
+    const trendLabels = sortedDates; 
+    const trendData = sortedDates.map(d => salesByDate[d]);
+
+    const sortedProducts = Object.entries(productSales).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const productLabels = sortedProducts.map(i => i[0]);
+    const productData = sortedProducts.map(i => i[1]);
+
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayData = Object.values(salesByDay);
+
+    res.render('analytics', {
+      trendLabels, trendData,
+      productLabels, productData,
+      cancelLabels: finalCancelLabels, 
+      cancelData: finalCancelData,
+      days, dayData,
+      customerType,
+      currentRange: range // Pass this to UI to highlight active button
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error generating analysis");
   }
 });
 

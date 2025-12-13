@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheet/output.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Sales Analytics</title>
+</head>
+
+<body class="bg-slate-900 text-white font-medium">
+
+  <header class="flex items-center justify-between px-8 py-5 border-b border-slate-800">
+    <div class="flex items-center gap-4">
+      <h1 class="text-3xl font-bold tracking-wide">Sales Analytics</h1>
+        <a href="/admindomain"
+      class="  bg-purple-600 hover:bg-purple-700 active:scale-95 transition  text-white md:px-4 md:py-2 py-1 px-1 rounded-md shadow-md absolute  right-5 top-5">
+      Go Back
+    </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto mt-8 px-6 pb-12">
+
+    <div class="flex justify-end mb-6 gap-2">
+      <a href="/analysis?range=7" 
+         class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentRange === '7' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700' %>">
+         Last 7 Days
+      </a>
+      <a href="/analysis?range=30" 
+         class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentRange === '30' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700' %>">
+         Last 30 Days
+      </a>
+      <a href="/analysis?range=year" 
+         class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentRange === 'year' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700' %>">
+         This Year
+      </a>
+      <a href="/analysis?range=all" 
+         class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentRange === 'all' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700' %>">
+         All Time
+      </a>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg mb-8">
+      <h2 class="text-xl font-bold text-purple-400 mb-4">📈 Sales Trend</h2>
+      <div class="h-80 w-full">
+        <% if(trendLabels.length > 0) { %>
+           <canvas id="trendChart"></canvas>
+        <% } else { %>
+           <div class="h-full flex items-center justify-center text-slate-500">No sales data for this period</div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+        <h2 class="text-xl font-bold text-purple-400 mb-4">🛒 Top 5 Products</h2>
+        <canvas id="productChart"></canvas>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+        <h2 class="text-xl font-bold text-purple-400 mb-4">📅 Best Sales Days</h2>
+        <canvas id="dayChart"></canvas>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+        <h2 class="text-xl font-bold text-purple-400 mb-4">👤 Customer Activity</h2>
+        <div class="flex items-center justify-center h-64">
+           <% if(customerType.new + customerType.returning > 0) { %>
+              <canvas id="customerChart"></canvas>
+           <% } else { %>
+              <p class="text-slate-500">No active customers in this period.</p>
+           <% } %>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+        <h2 class="text-xl font-bold text-rose-400 mb-4">❌ Cancellation Reasons</h2>
+        <div class="flex items-center justify-center h-64">
+           <% if(cancelLabels.length > 0) { %>
+              <canvas id="cancelChart"></canvas>
+           <% } else { %>
+              <p class="text-slate-500">No cancellations in this period. Great job! 🎉</p>
+           <% } %>
+        </div>
+        <p class="text-xs text-center text-slate-500 mt-4">Top 4 reasons shown. Rare reasons grouped as "Others".</p>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // 1. Trend Chart
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+      new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: <%- JSON.stringify(trendLabels) %>,
+          datasets: [{
+            label: 'Revenue',
+            data: <%- JSON.stringify(trendData) %>,
+            borderColor: '#a855f7',
+            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            tension: 0.3, fill: true
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#334155' } }, x: { grid: { color: '#334155' } } } }
+      });
+    }
+
+    // 2. Product Chart
+    new Chart(document.getElementById('productChart'), {
+      type: 'bar',
+      data: {
+        labels: <%- JSON.stringify(productLabels) %>,
+        datasets: [{
+          label: 'Qty Sold',
+          data: <%- JSON.stringify(productData) %>,
+          backgroundColor: ['#f472b6', '#c084fc', '#818cf8', '#60a5fa', '#34d399']
+        }]
+      },
+      options: { scales: { y: { grid: { color: '#334155' } }, x: { grid: { display: false } } } }
+    });
+
+    // 3. Day Chart
+    new Chart(document.getElementById('dayChart'), {
+      type: 'bar',
+      data: {
+        labels: <%- JSON.stringify(days) %>,
+        datasets: [{
+          label: 'Revenue',
+          data: <%- JSON.stringify(dayData) %>,
+          backgroundColor: '#38bdf8'
+        }]
+      },
+      options: { scales: { y: { grid: { color: '#334155' } }, x: { grid: { display: false } } } }
+    });
+
+    // 4. Customer Chart
+    const custCtx = document.getElementById('customerChart');
+    if(custCtx) {
+      new Chart(custCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['New (1st Order)', 'Returning'],
+          datasets: [{
+            data: [<%= customerType.new %>, <%= customerType.returning %>],
+            backgroundColor: ['#60a5fa', '#34d399'],
+            borderWidth: 0
+          }]
+        }
+      });
+    }
+
+    // 5. Cancel Chart
+    const cancelCtx = document.getElementById('cancelChart');
+    if (cancelCtx) {
+      new Chart(cancelCtx, {
+        type: 'pie',
+        data: {
+          labels: <%- JSON.stringify(cancelLabels) %>,
+          datasets: [{
+            data: <%- JSON.stringify(cancelData) %>,
+            backgroundColor: ['#f87171', '#fbbf24', '#f472b6', '#a78bfa', '#94a3b8'], // Last color (gray) is usually for 'Others'
+            borderWidth: 0
+          }]
+        }
+      });
+    }
+  </script>
+</body>
+</html>
