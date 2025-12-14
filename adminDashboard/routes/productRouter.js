@@ -359,7 +359,7 @@ router.get('/product/cart', isAuthenticate, async (req, res) => {
   res.render('cart', { products, productData });
 });
 
-router.get('/cart/remove/:color/:id', isAuthenticate, async (req, res) => {
+router.get('/cart/remove/:id', isAuthenticate, async (req, res) => {
   const color = req.params.color;
   const productId = req.params.id;
 
@@ -369,7 +369,6 @@ router.get('/cart/remove/:color/:id', isAuthenticate, async (req, res) => {
       $pull: {
         cart: {
           productId: productId,
-          color: color
         }
       }
     }

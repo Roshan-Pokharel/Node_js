@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');  
 const mongoose = require('./config/mongoose-connection');
 const app = express();
-const router = require('router');
+
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('connect-flash')
@@ -16,6 +16,8 @@ const secretkey = process.env.SECRET_KEY;
 const productModel = require('./model/product');
 const userModel = require('./model/user');
 const jwt = require('jsonwebtoken');
+const connectDB = require('./config/mongoose-connection'); 
+const PORT = process.env.PORT || 3000;
 
 
 app.use(session({
@@ -94,6 +96,12 @@ app.get('/userlogout', (req, res)=>{
 
 
 
-app.listen(3000, () => {
-    console.log('Admin Dashboard is running on port 3000');
-});
+
+const startServer = async () => {
+    await connectDB(); 
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+};
+
+startServer(); // Call the async function to start the process
