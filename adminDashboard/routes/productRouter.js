@@ -137,40 +137,56 @@ router.post('/product/edited/:id', isAdmin, upload.array('image', 6), async (req
   }
 });
 
-router.post('/cart/add/:id', isAuthenticate, async (req, res) => {
+// Step 1: Add to cart (public)
+router.post('/cart/add/:id', (req, res) => {
   const productId = req.params.id;
-  const quantity = parseInt(req.body.quantity) || 1;
-  // 1. Capture the color sent from the frontend form
-  const selectedColor = req.body.selectedColor; 
+
+  if (!req.cookies.authToken) {
+    req.flash('cartlogin', 'You need to log in before adding to cart.');
+    return res.redirect('/dashboard'); // ✅ return stops further execution
+  }
+
+  // Redirect to authenticated add route, preserving quantity & color
+  const quantity = req.body.quantity || 1;
+  const color = req.body.selectedColor || ''; // optional fallback
+
+  return res.redirect(`/cart/added/${productId}?quantity=${quantity}&color=${encodeURIComponent(color)}`);
+});
+
+// Step 2: Add to cart (authenticated)
+router.get('/cart/added/:id', isAuthenticate, async (req, res) => {
+  const productId = req.params.id;
+  const quantity = parseInt(req.query.quantity) || 1;
+  const selectedColor = req.query.color || '';
 
   try {
     const user = await userModel.findById(req.user.id);
 
-    // 2. logic update: Find item by Product ID AND Color
-    // If the user adds the same product but a different color, it should be a new entry
-    const item = user.cart.find(i => 
+    // Find existing item with same product + color
+    const item = user.cart.find(i =>
       i.productId.toString() === productId && i.color === selectedColor
     );
 
     if (item) {
-      // If product + specific color exists, just update quantity
-      item.quantity += quantity;
+      item.quantity += quantity; // update quantity
     } else {
-      // 3. If not, push new item WITH the color field
       user.cart.push({
         productId,
         quantity,
-        color: selectedColor // Save the color to the schema
+        color: selectedColor
       });
     }
 
     await user.save();
+
+    req.flash('cart', 'Added to cart'); // ✅ optional flash
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
     res.status(500).send("Error adding to cart");
   }
 });
+
 
 router.get('/product/order',isAdmin, async(req, res)=>{
   const users = (await userModel.find().populate('orders.productId')).reverse();

@@ -5,6 +5,7 @@ const mongoose = require('./config/mongoose-connection');
 const app = express();
 const router = require('router');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const flash = require('connect-flash')
 const userRouter = require('./routes/userRouter');
 const adminRouter = require('./routes/adminRouter');
@@ -12,7 +13,6 @@ const productRouter = require('./routes/productRouter');
 const isAuthenticated = require('./middlewares/authMiddleware');
 const isAdmin = require('./middlewares/adminMiddleware');
 const secretkey = process.env.SECRET_KEY;
-const session = require('express-session');
 const productModel = require('./model/product');
 const userModel = require('./model/user');
 const jwt = require('jsonwebtoken');
@@ -32,6 +32,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(flash());
 
+app.use((req, res, next) => {
+  res.locals.error = req.flash('error');
+  res.locals.success = req.flash('success');
+  res.locals.cartlogin = req.flash('cartlogin'); 
+  next();
+});
+
 app.use('/', userRouter);
 app.use('/', adminRouter);
 app.use('/', productRouter);
@@ -42,7 +49,7 @@ app.get('/dashboard', async (req, res) => {
   let signin = false;
   let totalQuantity = 0;
 
-  if (req.cookies.authToken) {
+  if (req.cookies.authToken) { 
     try {
       const decoded = jwt.verify(req.cookies.authToken, secretkey);
 
@@ -75,13 +82,13 @@ app.get('/admindashboard',isAdmin, async(req, res) => {
 
 
 app.get('/logout', (req, res)=>{
-  res.cookie('authToken', "");
-  res.cookie('adminAuthToken', "");
+res.clearCookie('authToken');
+res.clearCookie('adminAuthToken');
   res.redirect('/login');
 })
 
 app.get('/userlogout', (req, res)=>{
-  res.cookie('authToken', "");
+ res.clearCookie('authToken');
   res.redirect('/dashboard');
 })
 

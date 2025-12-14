@@ -46,7 +46,8 @@ module.exports.registerUser = async (req, res) => {
     const { username, password, email, remember } = req.body;
     let usernameFound =await  userModel.findOne({email : email});
     if (usernameFound) {
-    return res.status(409).send("Username already exists.");
+    req.flash('error', 'Username Already exist');
+    res.redirect('login')
     }
     
     // using bycript to hash password
@@ -71,6 +72,7 @@ module.exports.registerUser = async (req, res) => {
                 });   
               }
               else{
+                 req.flash('cart', 'Registration Successful');
                  res.redirect('/login'); 
               }
             
@@ -83,64 +85,69 @@ module.exports.registerUser = async (req, res) => {
    
 }
 
-module.exports.loginUser =  async (req, res) => {
-    const { email, password , remember} = req.body;
-    try {
-        const admin = await adminModel.findOne({email});
-        if (!admin) {
-        const user = await userModel.findOne({ email });
-       try{
-            if (!user) {
-            return res.status(400).send("Invalid email or password");
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).send("Invalid email or password");
-        }
-        if(remember==='1' ){
-           await jwt.sign({email, id:user._id}, secretkey, {expiresIn:'7d'}, (err, token) => {
-                if (err) {
-                    console.error("Error generating token:", err);
-                    return res.status(500).send("Internal Server Error");
-                }
-                res.cookie('authToken', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); 
-                res.redirect('/dashboard'); 
-            });   
-          }
-          else{
-       await jwt.sign({ email, id: user._id }, secretkey, { expiresIn: '1h' }, (err, token) => {
-            if (err) {
-                console.error("Error generating token:", err);
-                return res.status(500).send("Internal Server Error");
-            }
-            res.cookie('authToken', token, { httpOnly: true }); 
-            res.redirect('/dashboard'); 
-        })}
-          } catch(err){
-            console.error(err);
-          }
-        }
-        else{
-            try{
-                 const isMatchAdmin = await bcrypt.compare(password, admin.password);
-             if (!isMatchAdmin) {
-            return res.status(400).send("Invalid email or password");
-             }
-              await jwt.sign({email, id:admin._id}, adminsecretkey, {expiresIn:'7d'}, (err, token) => {
-                if (err) {
-                    console.error("Error generating token:", err);
-                    return res.status(500).send("Internal Server Error");
-                }
-                res.cookie('adminAuthToken', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); 
-                res.redirect('/admindomain'); 
-            }); 
-            } catch(err){
-                console.error(err);
-            }  
-        }
+module.exports.loginUser = async (req, res) => {
+  const { email, password, remember } = req.body;
 
-    } catch (err) {
-        console.error("Error during user login:", err);
-        res.status(500).send("Internal Server Error");
+  try {
+    // 1️⃣ Check admin first
+    const admin = await adminModel.findOne({ email });
+
+    if (admin) {
+      const isMatchAdmin = await bcrypt.compare(password, admin.password);
+
+      if (!isMatchAdmin) {
+        req.flash('error', 'Username or Password is incorrect');
+        return res.redirect('/login');
+      }
+
+      const token = jwt.sign(
+        { email, id: admin._id },
+        adminsecretkey,
+        { expiresIn: '7d' }
+      );
+
+      res.cookie('adminAuthToken', token, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+
+      return res.redirect('/admindomain');
     }
-}
+
+    // 2️⃣ Check normal user
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      req.flash('error', 'Username or Password is incorrect');
+      return res.redirect('/login');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      req.flash('error', 'Username or Password is incorrect');
+      return res.redirect('/login');
+    }
+
+    const expiresIn = remember === '1' ? '7d' : '1h';
+    const maxAge =
+      remember === '1' ? 7 * 24 * 60 * 60 * 1000 : undefined;
+
+    const token = jwt.sign(
+      { email, id: user._id },
+      secretkey,
+      { expiresIn }
+    );
+
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      maxAge
+    });
+
+    res.redirect('/dashboard');
+
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+};

@@ -114,6 +114,11 @@
 </nav>
 
   <main class="container mx-auto px-4 py-8">
+   <% if (cartlogin && cartlogin.length > 0) { %>
+                    <div id="flash-cart" class=" absolute top-20 left-200 bg-red-600 text-white p-2 rounded">
+                      <%= cartlogin[0] %>
+                    </div>
+                  <% } %>
     
     <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
       <div>
@@ -189,14 +194,33 @@
                     +
                   </button>
                 </div>
+                 
+                <form action="/cart/add/<%= product._id %>" method="POST" class="w-full add-to-cart-form">
+  <input type="hidden" name="quantity" value="1">
 
-                <form action="/cart/add/<%= product._id%>" method="POST" class="w-full">
-                  <input type="hidden" name="quantity" value="1" class="hiddenQty" data-id="<%= product._id %>">
-                  <button class="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <p class="hidden md:block">Add</p>
-                  </button>
-                </form>
+  <button type="submit"
+    class="add-btn w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm flex items-center justify-center gap-2 transition-all duration-200">
+
+    <!-- Cart Icon -->
+    <svg class="cart-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5
+           M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17
+           m0 0a2 2 0 100 4
+           m-8 2a2 2 0 11-4 0" />
+    </svg>
+
+    <!-- Tick Icon (hidden initially) -->
+    <svg class="tick-icon w-5 h-5 hidden text-green-300"
+      fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M5 13l4 4L19 7" />
+    </svg>
+
+    <span class="hidden md:block btn-text">Add</span>
+  </button>
+</form>
+
 
               </div>
             </div>
@@ -205,9 +229,40 @@
         
       <% }) %>
     </div>
+    
   </main>
 
   <script src="/javascript/mobileNabBar.js"></script>
   <script src="/javascript/dropdown.js"></script>
+  <script>
+  setTimeout(() => {
+    const cart = document.getElementById('flash-cart');
+
+    if (cart) {
+      cart.style.opacity = '0';
+      setTimeout(() => cart.remove(), 500);
+    }
+  }, 2000);
+</script>
+<script>
+  document.querySelectorAll('.add-to-cart-form').forEach(form => {
+    form.addEventListener('submit', () => {
+      const btn = form.querySelector('.add-btn');
+      const cartIcon = btn.querySelector('.cart-icon');
+      const tickIcon = btn.querySelector('.tick-icon');
+      const text = btn.querySelector('.btn-text');
+
+      // UI change
+      cartIcon.classList.add('hidden');
+      tickIcon.classList.remove('hidden');
+      if (text) text.innerText = 'Added';
+
+      btn.classList.remove('bg-indigo-600');
+      btn.classList.add('bg-green-600');
+    });
+  });
+</script>
+
+
 </body>
 </html>
