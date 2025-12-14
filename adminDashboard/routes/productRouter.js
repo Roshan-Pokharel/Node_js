@@ -405,25 +405,44 @@ router.get('/checkout', isAuthenticate, async (req, res) => {
       model: "Product"
     });
 
-   if (!user.address || !user.phoneNumber || !user.ward || !user.tole) {
-  return res.render('userDetails');
-}
-
-
-    if (!user) {
-      return res.status(404).send("User not found");
+    if (!user.address || !user.phoneNumber || !user.ward || !user.tole) {
+      return res.render('userDetails');
     }
 
-    if (user.cart.length === 0) {
-      return res.status(400).send("Cart is empty");
-    }
+    if (!user) return res.status(404).send("User not found");
+    if (user.cart.length === 0) return res.status(400).send("Cart is empty");
 
-    // Convert cart to orders with FIXED PRICES
-    const newOrders = user.cart.map(item => {
-      const product = item.productId;
+    // --- FIX START: Consolidate duplicate cart items before ordering ---
+    const consolidatedItems = {};
+    
+    user.cart.forEach(item => {
+      // Create a unique key based on Product ID and Color
+      // Handle cases where productId might be null (deleted product)
+      if (!item.productId) return; 
+      
+      const key = `${item.productId._id.toString()}-${item.color || ''}`;
+      
+      if (consolidatedItems[key]) {
+        consolidatedItems[key].quantity += item.quantity;
+      } else {
+        consolidatedItems[key] = {
+          productId: item.productId,
+          color: item.color || '',
+          quantity: item.quantity
+        };
+      }
+    });
+    
+    // Convert back to array
+    const finalCartItems = Object.values(consolidatedItems);
+    // --- FIX END ---
 
-      const priceNow = product.price;                // current price
-      const discountNow = product.discount || 0;     // current discount %
+    // Convert consolidated cart items to orders
+    const newOrders = finalCartItems.map(item => {
+      const product = item.productId; // This is the full product object
+
+      const priceNow = product.price;
+      const discountNow = product.discount || 0;
       const discountedPrice = priceNow - (priceNow * (discountNow / 100));
 
       return {
@@ -432,23 +451,17 @@ router.get('/checkout', isAuthenticate, async (req, res) => {
         quantity: item.quantity,
         status: "pending",
         orderDate: new Date(),
-
-        // FIXED VALUES (DO NOT CHANGE LATER)
         priceAtPurchase: priceNow,
         discountAtPurchase: discountNow,
         finalPrice: discountedPrice * item.quantity
       };
     });
 
-    // Save orders permanently
     user.orders.push(...newOrders);
-
-    // Clear cart
-    user.cart = [];
-
+    user.cart = []; // Clear cart
     await user.save();
 
-    res.redirect('/product/cart');
+    res.redirect('/orders'); // Redirect to orders page to see result
 
   } catch (err) {
     console.error(err);

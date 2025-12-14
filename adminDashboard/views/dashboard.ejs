@@ -40,7 +40,7 @@
                 <a href="/dashboard">
                     <div class="flex items-center gap-3">
                         <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
-                        <span class="hidden md:block text-xl font-bold bg-clip-text text-violet-600 ">StyleStore</span>
+                        <span class="hidden md:block text-xl font-bold bg-clip-text text-violet-600 ">DurgaGrocery</span>
                     </div>
                 </a>
             </div>
@@ -233,7 +233,7 @@
   </main>
 
   <script src="/javascript/mobileNabBar.js"></script>
-  <script src="/javascript/dropdown.js"></script>
+  
   <script>
   setTimeout(() => {
     const cart = document.getElementById('flash-cart');
@@ -259,6 +259,48 @@
 
       btn.classList.remove('bg-indigo-600');
       btn.classList.add('bg-green-600');
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Select all product cards on the dashboard
+    const productCards = document.querySelectorAll('.product-card');
+
+    productCards.forEach(card => {
+      // Find elements within this specific card
+      const minusBtn = card.querySelector('.minusBtn');
+      const plusBtn = card.querySelector('.plusBtn');
+      const visualInput = card.querySelector('.quantityInput');
+      // Find the hidden input inside the form that actually sends the data
+      const hiddenInput = card.querySelector('form input[name="quantity"]');
+
+      if (!minusBtn || !plusBtn || !visualInput || !hiddenInput) return;
+
+      // Increase Quantity
+      plusBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Stop page jump
+        let currentVal = parseInt(visualInput.value) || 1;
+        currentVal++;
+        
+        // Update both the visual box and the hidden form value
+        visualInput.value = currentVal;
+        hiddenInput.value = currentVal;
+      });
+
+      // Decrease Quantity
+      minusBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Stop page jump
+        let currentVal = parseInt(visualInput.value) || 1;
+        
+        if (currentVal > 1) {
+          currentVal--;
+          
+          // Update both the visual box and the hidden form value
+          visualInput.value = currentVal;
+          hiddenInput.value = currentVal;
+        }
+      });
     });
   });
 </script>
