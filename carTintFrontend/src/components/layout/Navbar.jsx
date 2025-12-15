@@ -10,15 +10,18 @@ export default function Navbar() {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         
         {/* --- Logo --- */}
-        <Link to="/" className="text-2xl font-bold hover:text-green-300 transition duration-300 z-50">
+        <Link to="/" className="  md:text-xl lg:text-2xl font-bold hover:text-green-300 transition duration-300 z-50">
           Car Tint Pro
         </Link>
 
         {/* --- Desktop Menu (Hidden on Mobile) --- */}
-        <div className="hidden md:flex space-x-6 items-center">
+        <div className="absolute md:right-10 lg:right-20 hidden md:flex md:space-x-3.5 lg:space-x-6 items-center">
           <Link to="/" className="hover:text-green-400 transition">Home</Link>
           <Link to="/dashboard" className="hover:text-green-400 transition">Dashboard</Link>
-          
+          <Link to="/" className="hover:text-green-400 transition">About</Link>
+          <Link to="/" className="hover:text-green-400 transition">What We Offer</Link>
+          <Link to="/" className="hover:text-green-400 transition">Galary</Link>
+      
           {/* Desktop Call Button */}
           <a href={`tel:${phoneNumber}`} className="flex items-center gap-2 hover:text-green-400 transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -32,9 +35,18 @@ export default function Navbar() {
           </Link>
         </div>
 
+         <a href={`tel:${phoneNumber}`} className="flex absolute md:hidden right-12 items-center hover:text-green-400 transition mr-7 gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+            </svg>
+            <span>Call Us</span>
+          </a>
+
+       
+
         {/* --- Hamburger Button --- */}
         <button 
-          className="md:hidden z-50 focus:outline-none"
+          className="md:hidden absolute right-5 z-50 focus:outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {/* We toggle the icon appearance based on state */}
@@ -68,11 +80,11 @@ export default function Navbar() {
           isMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col h-full pt-20 px-6 space-y-6">
+        <div className="flex flex-col h-full pt-20 px-6 space-y-4">
           
           <Link 
             to="/" 
-            className="text-lg font-medium hover:text-green-400 border-b border-slate-700 pb-2"
+            className="text-md font-medium hover:text-green-400 border-b border-slate-700 pb-2"
             onClick={() => setIsMenuOpen(false)}
           >
             Home
@@ -80,24 +92,33 @@ export default function Navbar() {
 
           <Link 
             to="/dashboard" 
-            className="text-lg font-medium hover:text-green-400 border-b border-slate-700 pb-2"
+            className="text-md font-medium hover:text-green-400 border-b border-slate-700 pb-2"
             onClick={() => setIsMenuOpen(false)}
           >
             Dashboard
           </Link>
 
-          {/* Mobile Call Button */}
-          <a 
-            href={`tel:${phoneNumber}`} 
-            className="flex items-center gap-3 text-green-300 font-semibold border-b border-slate-700 pb-2"
+           <Link 
+            to="/" 
+            className="text-md font-medium hover:text-green-400 border-b border-slate-700 pb-2"
+            onClick={() => setIsMenuOpen(false)}
           >
-            <div className="bg-green-900/50 p-2 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-              </svg>
-            </div>
-            <span>Call Now</span>
-          </a>
+            About
+          </Link>
+           <Link 
+            to="/" 
+            className="text-md font-medium hover:text-green-400 border-b border-slate-700 pb-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            What We Offer
+          </Link>
+           <Link 
+            to="/" 
+            className="text-md font-medium hover:text-green-400 border-b border-slate-700 pb-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Galary
+          </Link>
 
           <Link 
             to="/login" 

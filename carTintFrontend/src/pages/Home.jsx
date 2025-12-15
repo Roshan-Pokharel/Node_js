@@ -1,9 +1,17 @@
+import { Hero } from '../components/layout/Hero';
+// import { Calculator } from '../components/layout/Calculator';
+// import { WorkSection } from '../components/layout/WorkSection';
+// import { ShopSection } from '../components/layout/ShopSection';
+// import { ReviewsSection } from '../components/layout/ReviewsSection';
+
 export default function Home() {
   return (
-    
-    <h1 className="text-2xl text-green-500 ">
-     hello what are you doing in the middle of the jungle
-    </h1>
-  
-  )
+    <main>
+      <Hero />
+      {/* <Calculator />
+      <WorkSection />
+      <ShopSection />
+      <ReviewsSection /> */}
+    </main>
+  );
 }
