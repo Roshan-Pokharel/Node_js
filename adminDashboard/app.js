@@ -104,4 +104,4 @@ const startServer = async () => {
     });
 };
 
-startServer(); // Call the async function to start the process
+startServer();
