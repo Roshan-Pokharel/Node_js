@@ -1,17 +1,20 @@
-import { Hero } from '../components/layout/Hero';
-// import { Calculator } from '../components/layout/Calculator';
-// import { WorkSection } from '../components/layout/WorkSection';
-// import { ShopSection } from '../components/layout/ShopSection';
-// import { ReviewsSection } from '../components/layout/ReviewsSection';
+import HeroSlider from "../components/layout/HeroSlider";
 
 export default function Home() {
   return (
-    <main>
-      <Hero />
-      {/* <Calculator />
-      <WorkSection />
-      <ShopSection />
-      <ReviewsSection /> */}
-    </main>
+    <>
+      <HeroSlider />
+     
+
+      {/* Dummy sections so scroll works
+      <div id="calculator" className="h-screen bg-gray-100 p-10">
+        <h2 className="text-3xl font-bold">Calculator Section</h2>
+      </div>
+
+      <div id="about" className="h-screen bg-gray-200 p-10">
+        <h2 className="text-3xl font-bold">About Section</h2>
+      </div> */}
+
+    </> 
   );
 }
