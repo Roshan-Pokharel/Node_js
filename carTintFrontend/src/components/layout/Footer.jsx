@@ -1,5 +1,6 @@
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Logo from '../../assets/UZlogo.png';
 
 export default function Footer() {
   const scrollToSection = (sectionId) => {  // removed :string
@@ -15,14 +16,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white">CW</span>
-              </div>
-              <span className="text-white">CarWrap Pro</span>
+            <div>
+              <img src={Logo} alt="CarWrap Pro Logo" className="h-12 w-auto mb-4" />
             </div>
             <p className="text-gray-400 text-sm">
-              Professional car wrapping services that transform your vehicle with style and protection.
+              Professional car Tinting and wrapping services that transform your vehicle with style and protection.
             </p>
           </div>
 
@@ -31,15 +29,19 @@ export default function Footer() {
             <h4 className="text-white mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                
-                <button onClick={() => scrollToSection('about')} className="text-gray-400 hover:text-white transition-colors text-sm">
-                  About Us
-                </button>
+                <Link to="/service" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Services
+                </Link>
               </li>
               <li>
-                <button onClick={() => scrollToSection('calculator')} className="text-gray-400 hover:text-white transition-colors text-sm">
-                  Cost Calculator
-                </button>
+                <Link to="/bookings" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Book Now
+                </Link> 
+              </li>
+              <li>
+                <Link to="/about" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  About Us
+                </Link> 
               </li>
               <li>
                 <button onClick={() => scrollToSection('work')} className="text-gray-400 hover:text-white transition-colors text-sm">
@@ -49,11 +51,6 @@ export default function Footer() {
               <li>
                 <button onClick={() => scrollToSection('reviews')} className="text-gray-400 hover:text-white transition-colors text-sm">
                   Reviews
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToSection('shop')} className="text-gray-400 hover:text-white transition-colors text-sm">
-                  Shop
                 </button>
               </li>
             </ul>
@@ -101,7 +98,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2024 CarWrap Pro. All rights reserved.
+            © 2025 OZ Tint & Wrap. All rights reserved.
           </p>
         </div>
       </div>

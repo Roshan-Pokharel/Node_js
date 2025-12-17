@@ -1,16 +1,22 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home'
-// import Login from '../pages/Login'
-// import Dashboard from '../pages/Dashboard'
-// import NotFound from '../pages/NotFound'
+import Services from '../pages/Services'
+import ServiceDetail from '../components/layout/ServiceDetail'
+import InformationDetail from '../components/layout/InformationDetail'
+import BookingForm from '../pages/BookingForm';
+import About from '../pages/About';
 
 export default function AppRoutes() {
   return (
+   
     <Routes>
       <Route path="/" element={<Home />} />
-      {/* <Route path="/login" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="*" element={<NotFound />} /> */}
+      <Route path="/service" element={<Services />} />
+      <Route path="/service/:serviceId" element={<ServiceDetail />} />
+      <Route path="/service/:serviceId/book" element={<InformationDetail />} />
+      <Route path="/bookings" element={<BookingForm />} />
+      <Route path="/about" element={<About />} />
     </Routes>
+   
   )
 }

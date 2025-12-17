@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NavLink } from "react-router-dom";
 import logoImage from '../../assets/UZlogo.png';
+//import logoImageMB from '../../assets/UZlogo1.png';
 
 
 export default function Navbar() {
@@ -46,15 +47,20 @@ export default function Navbar() {
         
         {/* --- Logo --- */}
         <Link
-  to="/"
-  onClick={() => setIsMenuOpen(false)}
-  className=" font-bold tracking-wide text-cyan-400 hover:text-emerald-400 transition duration-300 z-50"
->
-  <img
-    src={logoImage}
-    className="h-[57px] md:h-[65px] w-auto"
-    alt="UZ TILT AND WRAP"
-  />
+        to="/"
+        onClick={() => setIsMenuOpen(false)}
+        className=" font-bold tracking-wide text-cyan-400 hover:text-emerald-400 transition duration-300 z-50"
+          >
+          <img
+            src={logoImage}
+            className=" h-[33px] md:h-[65px]  w-auto"
+            alt="UZ TILT AND WRAP"
+          />
+          {/* <img
+            src={logoImageMB}
+            className="md:hidden h-[57px] md:h-[65px] w-auto"
+            alt="UZ TILT AND WRAP"
+          /> */}
 </Link>
 
 
@@ -88,7 +94,7 @@ export default function Navbar() {
           </NavLink>
 
           <NavLink
-            to="/gallery"
+            to="/bookings"
             className={({ isActive }) =>
               `relative pb-1 text-slate-300 hover:text-cyan-400 transition-colors duration-300
               after:absolute after:left-1/2 after:-bottom-0.5 after:h-[2px] after:bg-cyan-400
@@ -97,7 +103,7 @@ export default function Navbar() {
               ${isActive ? "after:w-full text-white" : "after:w-0"}`
             }
           >
-            Gallery
+            Book Now
           </NavLink>
 
            <NavLink
@@ -190,7 +196,7 @@ export default function Navbar() {
   </NavLink>
 
   <NavLink
-    to="/gallery"
+    to="/bookings"
     className={({ isActive }) =>
       `block px-4 py-3 rounded-xl text-base font-medium
        transition-all duration-300
@@ -201,7 +207,7 @@ export default function Navbar() {
     }
     onClick={() => setIsMenuOpen(false)}
   >
-    Gallery
+    Book Now
   </NavLink>
 
   <NavLink

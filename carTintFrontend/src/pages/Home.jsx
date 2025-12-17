@@ -1,10 +1,15 @@
 import HeroSlider from "../components/layout/HeroSlider";
+import { ServicesSection } from "../components/layout/ServiceSection";
+import { ReviewsSection } from "../components/layout/ReviewsSection";
+import { WorkSection } from "../components/layout/WorkSection";
 
 export default function Home() {
   return (
     <>
       <HeroSlider />
-     
+      <ServicesSection />
+      <WorkSection />
+      <ReviewsSection />
 
       {/* Dummy sections so scroll works
       <div id="calculator" className="h-screen bg-gray-100 p-10">
