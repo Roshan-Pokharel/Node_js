@@ -17,7 +17,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div>
-              <img src={Logo} alt="CarWrap Pro Logo" className="h-12 w-auto mb-4" />
+              <img src={Logo} alt="CarWrap Pro Logo" className="h-7 md:h-12 w-auto mb-4" />
             </div>
             <p className="text-gray-400 text-sm">
               Professional car Tinting and wrapping services that transform your vehicle with style and protection.
