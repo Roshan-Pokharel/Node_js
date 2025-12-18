@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Calendar, Car, User, Mail, Phone, Info } from 'lucide-react'; // Recommended icons
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -19,9 +20,10 @@ const BookingForm = () => {
 
   const [message, setMessage] = useState('');
 
-  // Common Tailwind classes for inputs to keep code clean
-  const inputClass = "w-full p-3 mb-[15px] bg-slate-50 border border-[#3e3e4a] rounded-md text-slate-900 text-base transition-colors focus:outline-none focus:border-[#6c5ce7] box-border";
-  const labelClass = "block mb-1.5 font-medium text-[#a0a0b0] text-[0.9rem]";
+  // Enhanced Tailwind classes
+  const inputClass = "w-full p-3 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400";
+  const labelClass = "flex items-center gap-2 mb-2 font-semibold text-slate-700 text-sm";
+  const sectionWrapper = "bg-white p-6 rounded-xl border border-slate-100 shadow-sm mb-6";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,16 +32,11 @@ const BookingForm = () => {
 
   const handleServiceChange = (e) => {
     const value = e.target.value;
-    let name = '';
-    
-    if (value === 'tint') name = 'Window Tinting';
-    else if (value === 'restoration') name = 'Headlight Restoration';
-    else if (value === 'wrap') name = 'Vehicle Wrap';
-
+    const names = { tint: 'Window Tinting', restoration: 'Headlight Restoration', wrap: 'Vehicle Wrap' };
     setFormData(prev => ({
       ...prev,
       serviceType: value,
-      serviceName: name,
+      serviceName: names[value] || '',
       selectedShade: '',
       selectedCoverage: '',
       selectedHeadlights: ''
@@ -48,10 +45,7 @@ const BookingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.serviceType === 'wrap') {
-      alert("Vehicle Wrap is coming soon!");
-      return;
-    }
+    if (formData.serviceType === 'wrap') return;
 
     try {
       const response = await fetch('http://localhost:5000/api/bookings', {
@@ -61,47 +55,50 @@ const BookingForm = () => {
       });
 
       if (response.ok) {
-        setMessage('Booking submitted successfully!');
-        setFormData({ ...formData, firstName: '', lastName: '', email: '', phone: '' });
+        setMessage('Booking submitted successfully! We will contact you shortly.');
+        setFormData({ serviceType: '', serviceName: '', firstName: '', lastName: '', email: '', phone: '', make: '', model: '', year: '', date: '' });
       } else {
-        setMessage('Failed to submit booking.');
+        setMessage('Failed to submit booking. Please try again.');
       }
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('Network error occurred.');
+      setMessage('Network error. Check your connection.', error);
     }
   };
 
   return (
-    <div className="max-w-[600px] mx-auto my-10 p-[30px] mb-20 bg-slate-100 text-slate-900 rounded-[12px] shadow-[0_8px_24px_rgba(0,0,0,0.5)] font-sans">
+    <div className="max-w-2xl mx-auto my-12 p-4 md:p-10 bg-slate-50 text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white font-sans">
       
-      <h2 className="text-slate-900 text-2xl font-bold mb-5 text-center">Book Your Service</h2>
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Book Your Service</h2>
+        <div className="h-1 w-12 bg-indigo-500 mx-auto mt-3 rounded-full"></div>
+        <p className="text-slate-500 mt-4 text-sm">Professional automotive care at your fingertips.</p>
+      </div>
 
       <form onSubmit={handleSubmit}>
         {/* --- Service Selection --- */}
-        <div>
-          <label className={labelClass}>Select Service</label>
+        <div className="mb-8">
+          <label className={labelClass}><Info size={16} className="text-indigo-500"/> Select Service</label>
           <select 
             name="serviceType" 
             value={formData.serviceType} 
             onChange={handleServiceChange}
-            className={inputClass}
+            className={`${inputClass} h-[52px] cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_12px_center] bg-no-repeat`}
             required
           >
             <option value="">-- Choose a Service --</option>
             <option value="tint">Window Tinting</option>
             <option value="restoration">Headlight Restoration</option>
-            <option value="wrap">Vehicle Wrap</option>
+            <option value="wrap">Vehicle Wrap (Coming Soon)</option>
           </select>
         </div>
 
-        {/* --- Tint Logic --- */}
+        {/* --- Dynamic Options (Tint/Restoration) --- */}
         {formData.serviceType === 'tint' && (
-          <div className="bg-slate-50 p-[15px] rounded-lg border-l-4 border-[#6c5ce7] mb-5">
-            <h4 className="text-slate-900 text-lg font-semibold mb-5 text-center">Window Tint Options</h4>
-            <div className="flex gap-[15px]">
-              <div className="flex-1">
-                <label className={labelClass}>Shade Percentage</label>
+          <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 mb-8 animate-in fade-in slide-in-from-top-2 duration-300">
+            <h4 className="text-indigo-900 text-sm font-bold uppercase tracking-wider mb-4">Tint Customization</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-indigo-700 mb-1 block">Shade Percentage</label>
                 <select name="selectedShade" value={formData.selectedShade} onChange={handleChange} className={inputClass} required>
                   <option value="">Select Shade</option>
                   <option value="5%">5% (Limo Dark)</option>
@@ -110,8 +107,8 @@ const BookingForm = () => {
                   <option value="50%">50% (Light)</option>
                 </select>
               </div>
-              <div className="flex-1">
-                <label className={labelClass}>Coverage Area</label>
+              <div>
+                <label className="text-xs font-bold text-indigo-700 mb-1 block">Coverage Area</label>
                 <select name="selectedCoverage" value={formData.selectedCoverage} onChange={handleChange} className={inputClass} required>
                   <option value="">Select Coverage</option>
                   <option value="Full Car">Full Car</option>
@@ -123,85 +120,91 @@ const BookingForm = () => {
           </div>
         )}
 
-        {/* --- Restoration Logic --- */}
         {formData.serviceType === 'restoration' && (
-          <div className="bg-slate-50 p-[15px] rounded-lg border-l-4 border-[#6c5ce7] mb-5">
-             <h4 className="text-slate-900 text-lg font-semibold mb-5 text-center">Headlight Restoration</h4>
-             <label className={labelClass}>Which headlights need restoring?</label>
+          <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 mb-8 animate-in fade-in duration-300">
+             <label className="text-xs font-bold text-indigo-700 mb-1 block">Headlight Selection</label>
              <select name="selectedHeadlights" value={formData.selectedHeadlights} onChange={handleChange} className={inputClass} required>
-                <option value="">Select Option</option>
+                <option value="">Which headlights need restoring?</option>
                 <option value="Single">Single Headlight</option>
                 <option value="Both">Both Headlights</option>
               </select>
           </div>
         )}
 
-        {/* --- Wrap Logic (Blocking) --- */}
+        {/* --- Wrap Blocking --- */}
         {formData.serviceType === 'wrap' && (
-          <div className="bg-[#3d3d29] text-[#ffd700] p-5 rounded-lg text-center border border-[#665c20]">
-            <h3 className="text-xl font-bold mb-2">🚧 Coming Soon 🚧</h3>
-            <p>Vehicle Wrap services are currently unavailable. Please check back later!</p>
+          <div className="bg-amber-50 text-amber-700 p-8 rounded-2xl text-center border border-amber-200 mb-8">
+            <div className="text-3xl mb-2">✨</div>
+            <h3 className="text-lg font-bold">Coming Soon</h3>
+            <p className="text-sm opacity-80">Our wrap shop is currently undergoing upgrades. Stay tuned!</p>
           </div>
         )}
 
-        {/* --- General Fields (Hidden if Wrap is selected) --- */}
+        {/* --- Main Fields --- */}
         {formData.serviceType && formData.serviceType !== 'wrap' && (
-          <>
-            <div className="flex gap-[15px]">
-              <div className="flex-1">
-                <label className={labelClass}>Make</label>
-                <input type="text" name="make" placeholder="e.g. Toyota" value={formData.make} onChange={handleChange} className={inputClass} required />
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Vehicle Section */}
+            <div className={sectionWrapper}>
+              <h4 className="flex items-center gap-2 text-slate-800 font-bold mb-4 border-b border-slate-50 pb-2">
+                <Car size={18} className="text-indigo-500"/> Vehicle Details
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="col-span-1">
+                  <label className="text-xs font-bold text-slate-500 mb-1 block">Make</label>
+                  <input type="text" name="make" placeholder="Toyota" value={formData.make} onChange={handleChange} className={inputClass} required />
+                </div>
+                <div className="col-span-1">
+                  <label className="text-xs font-bold text-slate-500 mb-1 block">Model</label>
+                  <input type="text" name="model" placeholder="Camry" value={formData.model} onChange={handleChange} className={inputClass} required />
+                </div>
+                <div className="col-span-2 md:col-span-1">
+                  <label className="text-xs font-bold text-slate-500 mb-1 block">Year</label>
+                  <input type="number" name="year" placeholder="2022" value={formData.year} onChange={handleChange} className={inputClass} required />
+                </div>
               </div>
-              <div className="flex-1">
-                <label className={labelClass}>Model</label>
-                <input type="text" name="model" placeholder="e.g. Camry" value={formData.model} onChange={handleChange} className={inputClass} required />
-              </div>
-            </div>
-
-            <div className="flex gap-[15px]">
-               <div className="flex-1">
-                <label className={labelClass}>Year</label>
-                <input type="number" name="year" placeholder="2022" value={formData.year} onChange={handleChange} className={inputClass} required />
-              </div>
-              <div className="flex-1">
-                <label className={labelClass}>Preferred Date</label>
+              <div className="mt-4">
+                <label className={labelClass}><Calendar size={16} className="text-indigo-500"/> Preferred Date</label>
                 <input type="date" name="date" value={formData.date} onChange={handleChange} className={inputClass} required />
               </div>
             </div>
 
-            <h4 className="text-slate-900 text-lg font-semibold mb-5 mt-5 border-b border-[#3e3e4a] pb-2.5">Contact Info</h4>
-            
-            <div className="flex gap-[15px]">
-              <div className="flex-1">
-                <label className={labelClass}>First Name</label>
-                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className={inputClass} required />
+            {/* Contact Section */}
+            <div className={sectionWrapper}>
+              <h4 className="flex items-center gap-2 text-slate-800 font-bold mb-4 border-b border-slate-50 pb-2">
+                <User size={18} className="text-indigo-500"/> Contact Information
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} className={inputClass} required />
+                <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} className={inputClass} required />
               </div>
-              <div className="flex-1">
-                <label className={labelClass}>Last Name</label>
-                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={inputClass} required />
+              <div className="space-y-4">
+                <div className="relative">
+                  <Mail size={16} className="absolute left-3 top-3.5 text-slate-400"/>
+                  <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} className={`${inputClass} pl-10`} required />
+                </div>
+                <div className="relative">
+                  <Phone size={16} className="absolute left-3 top-3.5 text-slate-400"/>
+                  <input type="tel" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} className={`${inputClass} pl-10`} required />
+                </div>
               </div>
             </div>
 
-            <label className={labelClass}>Email Address</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} required />
-
-            <label className={labelClass}>Phone Number</label>
-            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} required />
-
             <button 
               type="submit" 
-              className="w-full p-3.5 bg-[#6c5ce7] text-white rounded-md text-[1.1rem] font-bold cursor-pointer transition-colors hover:bg-[#5a4ad1] mt-2.5"
+              className="w-full py-4 bg-indigo-600 text-white rounded-xl text-lg font-bold cursor-pointer transition-all hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]"
             >
               Confirm Booking
             </button>
-          </>
+          </div>
         )}
       </form>
 
       {message && (
-        <p className={`text-center mt-[15px] font-bold ${message.includes('success') ? 'text-[#00b894]' : 'text-[#ff7675]'}`}>
+        <div className={`mt-6 p-4 rounded-xl text-center text-sm font-bold animate-bounce ${
+          message.includes('successfully') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+        }`}>
           {message}
-        </p>
+        </div>
       )}
     </div>
   );

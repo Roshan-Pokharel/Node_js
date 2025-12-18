@@ -306,7 +306,7 @@ const ServiceDetail = () => {
 
             {serviceId === 'tint'  && (
               <Link to={`/service/${serviceId}/book`} state={{ shade: selectedShade, coverage: selectedCoverage, headlights: selectedHeadlights }}>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1">
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 mt-5 ">
                 Book Appointment
               </button>
             </Link>
@@ -314,7 +314,7 @@ const ServiceDetail = () => {
 
             {serviceId === 'restoration'  && (
               <Link to={`/service/${serviceId}/book`} state={{ shade: selectedShade, coverage: selectedCoverage, headlights: selectedHeadlights }}>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1">
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 mt-5">
                 Book Appointment
               </button>
             </Link>

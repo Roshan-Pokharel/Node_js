@@ -129,7 +129,7 @@ router.post('/submit-review', async (req, res) => {
             date: new Date()
         });
 
-        console.log('[SERVER] New Review Saved:', newReview.id);
+       // console.log('[SERVER] New Review Saved:', newReview.id);
         
         // Optional: Clean up OTP store now that review is done
         if(otpStore[email]) delete otpStore[email];
@@ -143,6 +143,22 @@ router.post('/submit-review', async (req, res) => {
              return res.status(400).json({ success: false, message: 'You have already reviewed us.' });
         }
         res.status(500).json({ success: false, message: 'Server error saving review.' });
+    }
+});
+
+router.get('/reviews', async (req, res) => {
+    try {
+        // 1. Sort by rating (highest first)
+        // 2. Then sort by date (newest first) for reviews with the same rating
+        // 3. Limit the result to only 6 items
+        const reviews = await Review.find({})
+            .sort({ rating: -1, date: -1 }) 
+            .limit(6);
+
+        res.json(reviews);
+    } catch (error) {
+        console.error('[DB ERROR]', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch reviews' });
     }
 });
 
