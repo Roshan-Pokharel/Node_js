@@ -103,7 +103,7 @@ const ServiceDetail = () => {
         {/* Hero Section */}
         <div className="mb-16">
           <span className="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-800 text-sm font-bold mb-4 uppercase tracking-wider">
-            Premium Service
+            Service Details
           </span>
           <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
             {service.title}

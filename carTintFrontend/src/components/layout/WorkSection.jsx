@@ -2,18 +2,20 @@ import React from 'react';
 import { ImageWithFallback } from '../common/ImageWithFallback';
 
 export function WorkSection() {
-  const works = [
+ const works = [
     {
-      image: 'https://images.unsplash.com/photo-1729232843619-0b1b3ce131f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjB3cmFwJTIwbWF0dGUlMjBibGFja3xlbnwxfHx8fDE3NjU3MzQyNzF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      title: 'Matte Black Elegance',
-      category: 'Full Wrap',
-      description: 'Complete matte black transformation for a sleek, sophisticated look.'
+      // REPLACED: Car Tint
+      image: 'https://lirp.cdn-website.com/68ca40c9/dms3rep/multi/opt/auto+window+tinting-2be5114e-1920w.jpg',
+      title: 'Premium Ceramic Tint',
+      category: 'Window Tinting',
+      description: 'High-performance ceramic tint providing superior heat rejection, UV protection, and privacy.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1656733020083-9a6501ee1677?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaHJvbWUlMjBjYXIlMjB3cmFwfGVufDF8fHx8MTc2NTczNDI3Mnww&ixlib=rb-4.1.0&q=80&w=1080',
-      title: 'Chrome Finish',
-      category: 'Premium Wrap',
-      description: 'Eye-catching chrome wrap that turns heads wherever you go.'
+      // REPLACED: Headlight Restoration
+      image: 'https://i.pinimg.com/originals/fe/bb/ac/febbac2594c81c1a4df73d8e90e9deab.jpg',
+      title: 'Headlight Restoration',
+      category: 'Restoration',
+      description: 'Restoring crystal clear visibility to cloudy headlights for improved safety and aesthetics.'
     },
     {
       image: 'https://images.unsplash.com/photo-1617024094355-b886817cffc4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xvciUyMGNhciUyMHdyYXB8ZW58MXx8fHwxNzY1NzM0MjcyfDA&ixlib=rb-4.1.0&q=80&w=1080',
@@ -32,12 +34,6 @@ export function WorkSection() {
       title: 'Luxury Package',
       category: 'Premium Wrap',
       description: 'High-end finish for luxury vehicles demanding perfection.'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1760550517611-31732ef31135?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBjYXIlMjB3cmFwfGVufDF8fHx8MTc2NTczNDI3Mnww&ixlib=rb-4.1.0&q=80&w=1080',
-      title: 'Sports Car Special',
-      category: 'Performance Wrap',
-      description: 'Aerodynamic wrap designed for high-performance vehicles.'
     }
   ];
 
