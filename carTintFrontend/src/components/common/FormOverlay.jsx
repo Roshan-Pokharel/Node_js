@@ -1,26 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Car, FileText, Layers, Clock, Lightbulb, Send, Info } from 'lucide-react';
+import { X, Check, Car, FileText, Layers, Clock, Lightbulb, Send, Info, MapPin } from 'lucide-react';
+
+/* ================= NSW SUBURBS LIST ================= */
+const NSW_SUBURBS = [
+  "Sydney",
+  "Parramatta",
+  "Blacktown",
+  "Liverpool",
+  "Penrith",
+  "Campbelltown",
+  "Bankstown",
+  "Hornsby",
+  "Chatswood",
+  "Ryde",
+  "Manly",
+  "Bondi",
+  "Burwood",
+  "Strathfield",
+  "Fairfield",
+  "Auburn",
+  "Granville",
+  "Epping",
+  "Castle Hill",
+  "Baulkham Hills"
+];
 
 export default function FormOverlay({ open, onClose }) {
-  // 1. State for Form Data
   const [formData, setFormData] = useState({
     suburb: "",
     vehicleReg: "",
     serviceType: "",
     repairPart: "",
-    tintCondition: "", 
+    tintCondition: "",
     fullName: "",
     phone: "",
     email: "",
     comments: ""
   });
 
-  // 2. State for Wizard Navigation & UI
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-
-  // Inline Error Messages
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -29,7 +49,6 @@ export default function FormOverlay({ open, onClose }) {
 
   if (!open) return null;
 
-  // --- Handlers ---
   const updateData = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (error) setError("");
@@ -38,28 +57,25 @@ export default function FormOverlay({ open, onClose }) {
   const handleNext = () => {
     setError("");
 
-    // Step 1 Validation
     if (currentStep === 1) {
       if (!formData.suburb || !formData.vehicleReg) {
-        return setError("Please provide your suburb and vehicle registration to proceed.");
+        return setError("Please provide your suburb and vehicle registration.");
       }
-      if (formData.suburb.trim().toLowerCase() !== "sydney") {
-        return setError("We currently only service the Sydney metropolitan area.");
+
+      if (!NSW_SUBURBS.includes(formData.suburb)) {
+        return setError("We currently only service New South Wales locations.");
       }
     }
 
-    // Step 2 Validation
     if (currentStep === 2 && !formData.serviceType) {
       return setError("Please select a service type.");
     }
 
-    // Step 3 Validation
     if (currentStep === 3) {
       if (formData.serviceType !== "wrap" && !formData.repairPart) {
         return setError("Please select an option to proceed.");
       }
-      
-      // Validation: Check tint condition for ANY tinting service
+
       if (formData.serviceType === "tinting" && !formData.tintCondition) {
         return setError("Please specify the current condition of your windows.");
       }
@@ -84,7 +100,7 @@ export default function FormOverlay({ open, onClose }) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/quotes", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/quotes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -95,46 +111,29 @@ export default function FormOverlay({ open, onClose }) {
       if (response.ok && result.success) {
         setIsComplete(true);
       } else {
-        setError(result.message || "An error occurred. Please try again.");
+        setError(result.message || "An error occurred.");
       }
-    } catch (err) {
-      console.error("Network Error:", err);
-      setError("Unable to connect to server. Please check your internet connection.");
+    } catch {
+      setError("Unable to connect to server.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isComplete) {
-    return <StepFive onClose={onClose} />;
-  }
+  if (isComplete) return <StepFive onClose={onClose} />;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-      />
+      <div onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       <div className="relative z-10 w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <div className="flex items-center gap-1 font-black text-2xl tracking-tighter">
-            <span className="text-black">OZ</span>
-            <span className="text-red-600">TINT</span>
-            <span className="text-black">&</span>
-            <span className="text-red-600">WRAP</span>
+        <div className="flex justify-between items-center p-5 border-b">
+          <div className="font-black text-2xl">
+            <span>OZ</span><span className="text-red-600">TINT</span>&<span className="text-red-600">WRAP</span>
           </div>
-
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-black transition p-1 hover:bg-gray-100 rounded-full"
-          >
-            <X size={24} />
-          </button>
+          <button onClick={onClose} className="hover:bg-gray-100 p-1 rounded-full transition"><X /></button>
         </div>
 
-        {/* Form Content */}
         <div className="flex-1 overflow-y-auto p-8">
           {currentStep === 1 && <StepOne data={formData} update={updateData} />}
           {currentStep === 2 && <StepTwo data={formData} update={updateData} />}
@@ -142,43 +141,26 @@ export default function FormOverlay({ open, onClose }) {
           {currentStep === 4 && <StepFour data={formData} update={updateData} />}
         </div>
 
-        {/* Footer / Controls */}
         <div className="p-6 border-t bg-gray-50 rounded-b-xl">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium flex items-center gap-3 animate-in fade-in slide-in-from-bottom-1">
-              <div className="bg-red-100 text-red-600 rounded-full p-1">
-                <Info size={16} />
-              </div>
-              {error}
+            <div className="mb-4 bg-red-50 border border-red-200 p-3 rounded-lg text-red-700 text-sm flex gap-2">
+              <Info size={16} className="shrink-0 mt-0.5" /> {error}
             </div>
           )}
 
           <div className="flex justify-between items-center">
             {currentStep > 1 ? (
-              <button
-                onClick={handleBack}
-                className="text-gray-500 font-semibold hover:text-black px-4 py-2 text-sm transition-colors"
-              >
-                Back
-              </button>
-            ) : (
-              <div />
-            )}
+              <button onClick={handleBack} className="text-gray-500 hover:text-gray-800 font-medium px-2">Back</button>
+            ) : <div />}
 
             {currentStep < 4 ? (
-              <button
-                onClick={handleNext}
-                className="bg-white border-2 border-red-600 text-red-600 font-bold py-2.5 px-8 rounded-lg hover:bg-red-600 hover:text-white transition-all uppercase text-sm tracking-wide"
-              >
+              <button onClick={handleNext} className="bg-red-600 hover:bg-red-700 transition text-white px-8 py-2.5 rounded-lg font-bold shadow-md shadow-red-200">
                 Continue
               </button>
             ) : (
-              <button
-                onClick={submitToBackend}
-                disabled={isSubmitting}
-                className="bg-red-600 text-white font-bold py-2.5 px-8 rounded-lg hover:bg-red-700 transition-all uppercase text-sm tracking-wide disabled:opacity-70 shadow-md hover:shadow-lg"
-              >
-                {isSubmitting ? "Processing..." : "Submit Request"}
+              <button onClick={submitToBackend} disabled={isSubmitting}
+                className="bg-red-600 hover:bg-red-700 transition text-white px-8 py-2.5 rounded-lg font-bold shadow-md shadow-red-200 disabled:opacity-70">
+                {isSubmitting ? "Processing..." : "Get Quote"}
               </button>
             )}
           </div>
@@ -188,89 +170,89 @@ export default function FormOverlay({ open, onClose }) {
   );
 }
 
-
-// --- SUB-COMPONENTS ---
-
+/* ================= STEP ONE (RE-STYLED) ================= */
 function StepOne({ data, update }) {
-  const quickSuburbs = ["Sydney", "Parramatta", "Blacktown", "Liverpool"];
-  const isSydney = data.suburb && data.suburb.trim().toLowerCase() === "sydney";
-  const hasInput = data.suburb && data.suburb.length > 0;
+  const [suggestions, setSuggestions] = useState([]);
+
+  const handleChange = (value) => {
+    update("suburb", value);
+
+    const filtered = NSW_SUBURBS.filter(sub =>
+      sub.toLowerCase().includes(value.toLowerCase())
+    );
+
+    setSuggestions(value ? filtered : []);
+  };
+
+  const selectSuburb = (sub) => {
+    update("suburb", sub);
+    setSuggestions([]);
+  };
+
+  const isValid = NSW_SUBURBS.includes(data.suburb);
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-1 font-sans">Location</h2>
-        <p className="text-gray-500 text-sm mb-4">Where is the vehicle located?</p>
-        
-        <label className="text-xs font-bold uppercase text-gray-500 mb-1.5 block tracking-wide">Suburb</label>
+    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+      <h2 className="text-xl font-bold text-gray-900 mb-2 font-sans">Vehicle Location</h2>
+      <p className="text-gray-500 text-sm mb-6">Enter your location and vehicle details to get started.</p>
+
+      <div className="space-y-6">
+        {/* Suburb Input */}
         <div className="relative">
+          <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 tracking-wide">
+            Suburb (NSW only) <span className="text-red-600">*</span>
+          </label>
+          
           <input
-            type="text"
             value={data.suburb}
-            onChange={e => update("suburb", e.target.value)}
-            placeholder="e.g. Sydney, NSW"
-            className="w-full border bg-white border-gray-300 rounded-lg p-3 pr-10 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 font-medium text-gray-800 transition-all"
+            onChange={e => handleChange(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition-all placeholder:text-gray-300"
+            placeholder="Start typing your suburb..."
           />
-          {data.suburb && (
-            <button
-              onClick={() => update("suburb", "")}
-              className="absolute right-3 top-3.5 text-gray-400 hover:text-red-500 transition"
-            >
-              <X size={18} />
-            </button>
+
+          {/* Autocomplete Dropdown */}
+          {suggestions.length > 0 && (
+            <ul className="absolute z-20 bg-white w-full border border-gray-200 rounded-xl mt-2 max-h-48 overflow-y-auto shadow-xl">
+              {suggestions.map(s => (
+                <li key={s}
+                  onClick={() => selectSuburb(s)}
+                  className="px-4 py-3 hover:bg-red-50 cursor-pointer text-gray-700 hover:text-red-700 transition-colors border-b last:border-0 border-gray-50 text-sm font-medium">
+                  {s}, NSW
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Validation Status */}
+          {data.suburb && !suggestions.length && (
+            <div className={`mt-2 text-xs font-medium flex items-center gap-1.5 ${isValid ? "text-green-600" : "text-red-500"}`}>
+              {isValid ? <Check size={14} /> : <Info size={14} />}
+              {isValid ? "Location confirmed" : "Service unavailable in this location"}
+            </div>
           )}
         </div>
-        
-        <div className="mt-3 flex flex-wrap gap-2">
-          {quickSuburbs.map(sub => (
-            <button
-              key={sub}
-              onClick={() => update("suburb", sub)}
-              className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors ${
-                data.suburb === sub
-                  ? "bg-red-600 text-white border-red-600"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700"
-              }`}
-            >
-              {sub}
-            </button>
-          ))}
+
+        {/* Vehicle Registration Input */}
+        <div>
+          <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 tracking-wide">
+            Vehicle Registration <span className="text-red-600">*</span>
+          </label>
+          <input
+            value={data.vehicleReg}
+            onChange={e => update("vehicleReg", e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition-all placeholder:text-gray-300 uppercase"
+            placeholder="e.g. CX-5 or ABC-123"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+             We use this to identify your exact vehicle model for accurate pricing.
+          </p>
         </div>
-
-        {hasInput && (
-          <div className="mt-3 animate-in fade-in slide-in-from-bottom-2">
-            {isSydney ? (
-              <div className="bg-green-50 text-green-700 px-3 py-2 text-sm rounded-lg flex items-center gap-2 font-medium border border-green-200">
-                <Check size={14} className="text-green-600" />
-                Excellent, we service your area.
-              </div>
-            ) : (
-              <div className="bg-red-50 text-red-700 px-3 py-2 text-sm rounded-lg flex items-center gap-2 font-medium border border-red-200">
-                <X size={14} className="text-red-600" />
-                Sorry, we are not available in this area yet.
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="pt-4 border-t border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-1 font-sans">Vehicle Details</h2>
-        <p className="text-gray-500 text-sm mb-4">Identify the car tailored for the service.</p>
-        
-        <label className="text-xs font-bold uppercase text-gray-500 mb-1.5 block tracking-wide">Registration or Model</label>
-        <input
-          type="text"
-          value={data.vehicleReg}
-          onChange={e => update("vehicleReg", e.target.value)}
-          placeholder="e.g. Toyota Camry or Plate #"
-          className="w-full border bg-white border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 font-medium text-gray-800 transition-all"
-        />
       </div>
     </div>
   );
 }
 
+/* ================= STEP TWO ================= */
 function StepTwo({ data, update }) {
   const options = [
     { id: "headlight", label: "Headlight Restoration", sub: "Restore clarity & safety", icon: <Lightbulb size={40} className="text-yellow-500" /> },
@@ -324,6 +306,7 @@ function StepTwo({ data, update }) {
   );
 }
 
+/* ================= STEP THREE ================= */
 function StepThree({ data, update }) {
   // Logic for Wraps (Coming Soon)
   if (data.serviceType === "wrap") {
@@ -357,7 +340,6 @@ function StepThree({ data, update }) {
   const currentOptions = isHeadlight ? headlightOptions : tintingOptions;
   const title = isHeadlight ? "Headlight Options" : "Select Tint Coverage";
   const desc = isHeadlight ? "How many lights need restoring?" : "Which windows require tinting?";
-  const IconComponent = isHeadlight ? Lightbulb : Car;
 
   const handlePartSelect = (id) => {
     update("repairPart", id);
@@ -399,7 +381,7 @@ function StepThree({ data, update }) {
                 </div>
               </div>
 
-              {/* --- TINT CONDITION OPTIONS (Updated Text) --- */}
+              {/* --- TINT CONDITION OPTIONS --- */}
               {isSelected && !isHeadlight && (
                 <div 
                   className="mt-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-2"
@@ -440,6 +422,7 @@ function StepThree({ data, update }) {
   );
 }
 
+/* ================= STEP FOUR ================= */
 function StepFour({ data, update }) {
   return (
     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
@@ -499,6 +482,7 @@ function StepFour({ data, update }) {
   );
 }
 
+/* ================= STEP FIVE (SUCCESS) ================= */
 function StepFive({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

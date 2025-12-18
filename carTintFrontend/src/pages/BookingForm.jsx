@@ -64,7 +64,7 @@ const BookingForm = () => {
     setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -128,7 +128,7 @@ const BookingForm = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto my-12 p-4 md:p-10 bg-slate-50 text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white font-sans">
+    <div className="max-w-2xl  mx-auto my-12 p-4 md:p-10 bg-slate-50 text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white font-sans ">
       
       <div className="text-center mb-10">
         <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Book Your Service</h2>

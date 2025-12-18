@@ -1,32 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Star, Quote, Loader2, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Star, Quote, Loader2, ArrowLeft, Filter } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom';
 
-
-export function ReviewsSection() {
+export default function Reviews() {
   const [reviews, setReviews] = useState([]);
-  const [stats, setStats] = useState({ totalCount: 0, averageRating: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortBy, setSortBy] = useState('newest'); // State for sorting
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/allreviews`);
         
         if (!response.ok) {
           throw new Error('Failed to connect to the server');
         }
 
         const data = await response.json();
-        
-        // Handle the new response structure { reviews: [], totalCount: 0, averageRating: 0 }
-        // Fallback to empty array if data.reviews is undefined to prevent crashes
         const reviewsList = data.reviews || [];
 
         const formattedReviews = reviewsList.map((review) => ({
           name: review.name,
           rating: review.rating,
+          // Store raw date object for easier sorting
+          rawDate: new Date(review.date), 
           date: new Date(review.date).toLocaleDateString('en-US', { 
             month: 'long', 
             year: 'numeric' 
@@ -36,11 +35,7 @@ export function ReviewsSection() {
         }));
 
         setReviews(formattedReviews);
-        setStats({
-            totalCount: data.totalCount || 0,
-            averageRating: data.averageRating || 0
-        });
-
+       
       } catch (err) {
         setError('Could not load reviews. Please try again later.');
         console.error("Error fetching reviews:", err);
@@ -51,6 +46,25 @@ export function ReviewsSection() {
 
     fetchReviews();
   }, []);
+
+  // Sort reviews based on the selected filter
+  const sortedReviews = useMemo(() => {
+    // Create a copy to avoid mutating state directly
+    const sorted = [...reviews];
+    
+    switch (sortBy) {
+      case 'newest':
+        return sorted.sort((a, b) => b.rawDate - a.rawDate);
+      case 'oldest':
+        return sorted.sort((a, b) => a.rawDate - b.rawDate);
+      case 'highest':
+        return sorted.sort((a, b) => b.rating - a.rating);
+      case 'lowest':
+        return sorted.sort((a, b) => a.rating - b.rating);
+      default:
+        return sorted;
+    }
+  }, [reviews, sortBy]);
 
   if (loading) {
     return (
@@ -66,8 +80,38 @@ export function ReviewsSection() {
   }
 
   return (
-    <section id="reviews" className="py-20 bg-white">
+    <section id="reviews" className="py-10 bg-white">
       <div className="container mx-auto px-4">
+        
+        {/* Navigation and Controls Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors font-medium w-fit"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
+
+          {/* Filter Dropdown */}
+          <div className="flex absolute right-5 md:right-10 lg:right-20 items-center gap-3">
+            <span className="text-gray-500 text-sm font-medium flex items-center gap-1">
+              <Filter className="w-4 h-4" />
+              Sort by:
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="highest">Highest Rating</option>
+              <option value="lowest">Lowest Rating</option>
+            </select>
+          </div>
+        </div>
+
         <div className="text-center mb-12">
           <h2 className="text-gray-900 text-3xl font-bold mb-4">Customer Reviews</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -75,13 +119,13 @@ export function ReviewsSection() {
           </p>
         </div>
 
-        {reviews.length === 0 ? (
+        {sortedReviews.length === 0 ? (
           <div className="text-center text-gray-500">
             <p>No reviews yet. Be the first to review us!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.map((review, index) => (
+            {sortedReviews.map((review, index) => (
               <div 
                 key={index}
                 className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow"
@@ -106,36 +150,6 @@ export function ReviewsSection() {
             ))}
           </div>
         )}
-
-        {/* Aggregate Score Badge & See More Button */}
-        <div className="mt-12 flex flex-col items-center gap-6">
-          
-          {/* Statistics Badge */}
-          <div className="inline-flex flex-col items-center gap-2 bg-blue-600 text-white px-8 py-6 rounded-xl shadow-lg">
-            <div className="flex items-center gap-2">
-              <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-              <span className="text-2xl font-bold">
-                {/* Use the global average from database */}
-                {Number(stats.averageRating).toFixed(1)}/5.0
-              </span>
-            </div>
-            {/* Use the global count from database */}
-            <p className="text-blue-100">Based on {stats.totalCount} verified reviews</p>
-          </div>
-
-          {/* See More Button */}
-          {/* Replace /all-reviews with the actual path to your full reviews page */}
-          {reviews.length > 0 && (
-              <Link
-                to="/allreviews" 
-                className="group flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
-              >
-                See More Reviews
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            )}
-
-        </div>
       </div>
     </section>
   );

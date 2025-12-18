@@ -24,7 +24,7 @@ function Rating() {
     }
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/generate-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/generate-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email }), 
@@ -46,7 +46,7 @@ function Rating() {
   const handleVerifyOTP = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/verify-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userOtp: otpInput, email: email }),
@@ -74,7 +74,7 @@ function Rating() {
     setLoading(true);
     try {
       const finalData = { ...reviewData, email: email };
-      const response = await fetch('http://localhost:5000/api/submit-review', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submit-review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData),

@@ -28,7 +28,7 @@ const ReviewSchema = new mongoose.Schema({
     required: [true, 'Please provide a review message'],
     maxLength: [500, 'Review cannot be more than 500 characters'],
   },
-  createdAt: {
+  date: {
     type: Date,
     default: Date.now,
   },

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review'); // Ensure this path is correct
-const { createOtp, verifyOtp, submitReview , getReviews} = require('../controllers/otpController');
+const { createOtp, verifyOtp, submitReview , getReviews, getAllReviews} = require('../controllers/otpController');
 const otpStore = require('../services/otpStore');
 // --- STORAGE ---
 // OTPs stored temporarily here.
@@ -18,5 +18,8 @@ router.post('/submit-review', submitReview );
 
 // --- 3. Get Review Endpoint ---
 router.get('/reviews', getReviews);
+
+// --- 4. Get All Reviews Endpoint ---
+router.get('/allreviews', getAllReviews);
 
 module.exports = router;

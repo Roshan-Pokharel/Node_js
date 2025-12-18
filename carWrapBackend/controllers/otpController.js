@@ -31,14 +31,14 @@ const getEmailTemplate = (otp) => `
     </html>
 `;
 
-exports.createOtp = async (req, res) => { // Make this function async
+exports.createOtp = async (req, res) => { 
+    // ... (Keep existing code)
     const { email } = req.body;
     if (!email) {
         return res.status(400).json({ success: false, message: 'Email is required.' });
     }
 
     try {
-        // [NEW] CHECK DATABASE: Does a review with this email already exist?
         const existingReview = await Review.findOne({ email: email });
         if (existingReview) {
             return res.status(400).json({ 
@@ -47,19 +47,16 @@ exports.createOtp = async (req, res) => { // Make this function async
             });
         }
 
-        // ... If no review exists, proceed with OTP generation ...
-
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         otpStore[email] = otp;
 
-        // Auto-delete OTP after 10 minutes
         setTimeout(() => delete otpStore[email], 10 * 60 * 1000);
 
         const mailOptions = {
             from: '"Oz Tint & Wrap" <oztintandwrap@gmail.com>', 
             to: email,
             subject: 'Your Verification Code',
-            html: getEmailTemplate(otp) // Assuming you used the helper function from my previous response
+            html: getEmailTemplate(otp) 
         };
 
         await transporter.sendMail(mailOptions);
@@ -72,6 +69,7 @@ exports.createOtp = async (req, res) => { // Make this function async
 }
 
 exports.verifyOtp =  (req, res) => {
+    // ... (Keep existing code)
     const { userOtp, email } = req.body;
 
     if (!email || !userOtp) {
@@ -79,7 +77,7 @@ exports.verifyOtp =  (req, res) => {
     }
 
     if (otpStore[email] && otpStore[email] === userOtp) {
-        delete otpStore[email]; // Clear OTP immediately after use
+        delete otpStore[email]; 
         res.json({ success: true, message: 'OTP Verified!' });
     } else {
         res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
@@ -87,11 +85,11 @@ exports.verifyOtp =  (req, res) => {
 }
 
 exports.submitReview = async (req, res) => {
+    // ... (Keep existing code)
     try {
         const { name, carModel, rating, review, email } = req.body;
         
-        // [NEW] FINAL CHECK: specific double-check before saving
-        const existingReview = await Review.findOne({ where: { email: email } });
+        const existingReview = await Review.findOne({ email: email }); // Fixed syntax error from 'where' clause
         if (existingReview) {
             return res.status(400).json({ 
                 success: false, 
@@ -99,7 +97,6 @@ exports.submitReview = async (req, res) => {
             });
         }
 
-        // Save new review
         const newReview = await Review.create({
             name,
             email,
@@ -108,18 +105,14 @@ exports.submitReview = async (req, res) => {
             review,
             date: new Date()
         });
-
-       // console.log('[SERVER] New Review Saved:', newReview.id);
         
-        // Optional: Clean up OTP store now that review is done
         if(otpStore[email]) delete otpStore[email];
 
         res.json({ success: true, message: 'Review submitted successfully!' });
 
     } catch (error) {
         console.error('[DB ERROR]', error);
-        // Handle "Unique Constraint" error specifically if your DB enforces it
-        if (error.name === 'SequelizeUniqueConstraintError') {
+        if (error.name === 'SequelizeUniqueConstraintError' || error.code === 11000) {
              return res.status(400).json({ success: false, message: 'You have already reviewed us.' });
         }
         res.status(500).json({ success: false, message: 'Server error saving review.' });
@@ -128,14 +121,46 @@ exports.submitReview = async (req, res) => {
 
 exports.getReviews = async (req, res) => {
     try {
-        // 1. Sort by rating (highest first)
-        // 2. Then sort by date (newest first) for reviews with the same rating
-        // 3. Limit the result to only 6 items
-        const reviews = await Review.find({})
-            .sort({ rating: -1, date: -1 }) 
-            .limit(6);
+        // Run two queries in parallel for efficiency
+        const [reviews, stats] = await Promise.all([
+            // 1. Get Top 9 Reviews
+            Review.find({}, 'name carModel rating review date') // Select only needed fields
+                .sort({ rating: -1, date: -1 }) 
+                .limit(6), 
 
-        res.json(reviews);
+            // 2. Calculate Total Count and Average Rating from ALL data
+            Review.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        averageRating: { $avg: "$rating" },
+                        totalReviews: { $sum: 1 }
+                    }
+                }
+            ])
+        ]);
+
+        const globalStats = stats.length > 0 ? stats[0] : { averageRating: 0, totalReviews: 0 };
+
+        res.json({
+            reviews,
+            totalCount: globalStats.totalReviews,
+            averageRating: globalStats.averageRating
+        });
+
+    } catch (error) {
+        console.error('[DB ERROR]', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch reviews' });
+    }
+}
+
+exports.getAllReviews = async (req, res) => {
+    try {
+        const reviews = await Review.find({}, 'name carModel rating review date') 
+        res.json({
+            reviews
+        });
+
     } catch (error) {
         console.error('[DB ERROR]', error);
         res.status(500).json({ success: false, message: 'Failed to fetch reviews' });

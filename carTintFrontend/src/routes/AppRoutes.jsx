@@ -5,6 +5,7 @@ import ServiceDetail from '../components/layout/ServiceDetail'
 import InformationDetail from '../components/layout/InformationDetail'
 import BookingForm from '../pages/BookingForm';
 import About from '../pages/About';
+import Reviews from '../pages/Reviews';
 
 export default function AppRoutes() {
   return (
@@ -16,6 +17,7 @@ export default function AppRoutes() {
       <Route path="/service/:serviceId/book" element={<InformationDetail />} />
       <Route path="/bookings" element={<BookingForm />} />
       <Route path="/about" element={<About />} />
+      <Route path="/allreviews" element={<Reviews />} />
     </Routes>
    
   )
