@@ -18,6 +18,8 @@ const QuoteSchema = new mongoose.Schema({
   phone: { type: String },
   email: { type: String, required: true },
   comments: { type: String },
+  mailingList: { type: Boolean, default: false },
+  status: { type: String, default: 'Pending' },
 
   // Automatically add createdAt and updatedAt timestamps
 }, { timestamps: true });

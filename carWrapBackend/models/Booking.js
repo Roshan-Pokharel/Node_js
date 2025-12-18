@@ -15,6 +15,7 @@ const BookingSchema = new mongoose.Schema({
   year: { type: Number, required: true },
   date: { type: String, required: true }, // Keeping as string to match input type="date"
   status: { type: String, default: 'Pending' }, // internal tracking
+  mailingList: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 
