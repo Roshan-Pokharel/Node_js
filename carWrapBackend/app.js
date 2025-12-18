@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const quoteRoutes = require('./routes/QuoteRoutes');
 const BookingRoutes = require('./routes/bookingRoutes');
 const otpRoutes = require('./routes/otpRoutes');
+const hitRoutes = require('./routes/hitRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true })); // Parses URL-encoded data
 app.use('/api/quotes', quoteRoutes);
 app.use('/api/bookings', BookingRoutes);
 app.use('/api', otpRoutes);
+app.use('/api/hits', hitRoutes);
 
 // 404 Handler
 app.use((req, res) => {

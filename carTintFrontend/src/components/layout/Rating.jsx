@@ -104,7 +104,7 @@ function Rating() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
+    <div className="min-h-auto md:min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
       {/* Container - Wider on Desktop (max-w-2xl) */}
       <div className="bg-white shadow-2xl rounded-2xl overflow-hidden max-w-2xl w-full border border-gray-100 transition-all duration-300">
         

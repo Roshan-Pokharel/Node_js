@@ -1,14 +1,50 @@
+import { useState, useEffect } from 'react';
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../../assets/UZlogo.png';
 
+// New component for a single flip card digit
+const FlipCard = ({ digit }) => {
+  return (
+    <div className="relative w-10 h-14 bg-blue-500 rounded-lg flex items-center justify-center overflow-hidden shadow-md">
+      <span className="text-white text-3xl font-bold">{digit}</span>
+      {/* Simulated flip effect line */}
+      <div className="absolute top-1/2 left-0 w-full h-px bg-blue-400 bg-opacity-50"></div>
+    </div>
+  );
+};
+
 export default function Footer() {
-  const scrollToSection = (sectionId) => {  // removed :string
+  const [hitCount, setHitCount] = useState(null);
+
+  // Function to fetch hit count
+  useEffect(() => {
+    const fetchHits = async () => {
+      try {
+        // NOTE: Change 'http://localhost:5000' to your production URL if deployed
+        const response = await fetch('http://localhost:5000/api/hits');
+        const data = await response.json();
+        
+        if (data.success) {
+          setHitCount(data.count);
+        }
+      } catch (error) {
+        console.error("Error fetching hit count:", error);
+      }
+    };
+
+    fetchHits();
+  }, []);
+
+  const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Format the hit count to a 5-digit string, e.g., 1 -> "00001"
+  const formattedHitCount = hitCount !== null ? hitCount.toString().padStart(5, '0') : '00000';
 
   return (
     <footer className="bg-gray-900 text-white py-12">
@@ -92,14 +128,25 @@ export default function Footer() {
             <p className="text-gray-400 text-sm mt-4">
               Stay updated with our latest projects and offers!
             </p>
+            {/* Flip-Style Hit Counter */}
+          <div className="flex flex-col order-1 mt-5 md:order-2">
+            <div className="flex gap-1">
+              {formattedHitCount.split('').map((digit, index) => (
+                <FlipCard key={index} digit={digit} />
+              ))}
+            </div>
+            <span className="text-gray-400 text-sm font-bold mt-2 tracking-widest uppercase">UNIQUE VISITS COUNTS</span>
+          </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-8 text-center">
-          <p className="text-gray-400 text-sm">
+        {/* Bottom Bar with Flip-Style Counter */}
+        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6">
+          <p className="text-gray-400 text-sm order-2 md:order-1">
             © 2025 OZ Tint & Wrap. All rights reserved.
           </p>
+          
+          
         </div>
       </div>
     </footer>

@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Calendar, Car, User, Mail, Phone, Info } from 'lucide-react'; // Recommended icons
+import { 
+  Calendar, 
+  Car, 
+  User, 
+  Mail, 
+  Phone, 
+  Info, 
+  Loader2, 
+  CheckCircle, 
+  AlertCircle 
+} from 'lucide-react';
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +28,9 @@ const BookingForm = () => {
     date: ''
   });
 
-  const [message, setMessage] = useState('');
+  // State management to match InformationDetail.jsx pattern
+  const [status, setStatus] = useState('idle'); // 'idle', 'submitting', 'success', 'error'
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Enhanced Tailwind classes
   const inputClass = "w-full p-3 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400";
@@ -47,6 +59,10 @@ const BookingForm = () => {
     e.preventDefault();
     if (formData.serviceType === 'wrap') return;
 
+    // Set loading state and clear previous errors
+    setStatus('submitting');
+    setErrorMessage('');
+
     try {
       const response = await fetch('http://localhost:5000/api/bookings', {
         method: 'POST',
@@ -54,16 +70,62 @@ const BookingForm = () => {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setMessage('Booking submitted successfully! We will contact you shortly.');
-        setFormData({ serviceType: '', serviceName: '', firstName: '', lastName: '', email: '', phone: '', make: '', model: '', year: '', date: '' });
-      } else {
-        setMessage('Failed to submit booking. Please try again.');
+      if (!response.ok) {
+        throw new Error('Failed to submit booking');
       }
+
+      // If successful, switch to success view
+      setStatus('success');
+      
     } catch (error) {
-      setMessage('Network error. Check your connection.', error);
+      console.error("Booking Error:", error);
+      setStatus('error');
+      setErrorMessage('Network error. Please try again or check your connection.');
     }
   };
+
+  const resetForm = () => {
+    setFormData({
+      serviceType: '', 
+      serviceName: '', 
+      selectedShade: '',
+      selectedCoverage: '',
+      selectedHeadlights: '',
+      firstName: '', 
+      lastName: '', 
+      email: '', 
+      phone: '', 
+      make: '', 
+      model: '', 
+      year: '', 
+      date: ''
+    });
+    setStatus('idle');
+  };
+
+  // --- SUCCESS VIEW (Replaces Form on Success) ---
+  if (status === 'success') {
+    return (
+      <div className="max-w-2xl mx-auto my-12 p-10 bg-white text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 font-sans text-center">
+        <div className="flex justify-center mb-6">
+          <div className="bg-emerald-100 p-4 rounded-full">
+            <CheckCircle className="w-12 h-12 text-emerald-600" />
+          </div>
+        </div>
+        <h2 className="text-3xl font-extrabold text-slate-800 mb-4">Booking Confirmed!</h2>
+        <p className="text-slate-600 mb-8">
+          We have received your request for <strong>{formData.serviceName}</strong>. 
+          Our team will contact you shortly at <strong>{formData.phone}</strong>.
+        </p>
+        <button 
+          onClick={resetForm}
+          className="w-full py-4 bg-slate-900 text-white rounded-xl text-lg font-bold hover:bg-slate-800 transition-all"
+        >
+          Book Another Service
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto my-12 p-4 md:p-10 bg-slate-50 text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white font-sans">
@@ -75,6 +137,15 @@ const BookingForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
+        
+        {/* --- Error Message Display --- */}
+        {status === 'error' && (
+          <div className="mb-6 bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center border border-rose-100 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+            <span className="text-sm font-semibold">{errorMessage}</span>
+          </div>
+        )}
+
         {/* --- Service Selection --- */}
         <div className="mb-8">
           <label className={labelClass}><Info size={16} className="text-indigo-500"/> Select Service</label>
@@ -189,23 +260,24 @@ const BookingForm = () => {
               </div>
             </div>
 
+            {/* --- Updated Button with Loading State --- */}
             <button 
               type="submit" 
-              className="w-full py-4 bg-indigo-600 text-white rounded-xl text-lg font-bold cursor-pointer transition-all hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]"
+              disabled={status === 'submitting'}
+              className="w-full py-4 bg-indigo-600 text-white rounded-xl text-lg font-bold cursor-pointer transition-all hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
             >
-              Confirm Booking
+              {status === 'submitting' ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm Booking"
+              )}
             </button>
           </div>
         )}
       </form>
-
-      {message && (
-        <div className={`mt-6 p-4 rounded-xl text-center text-sm font-bold animate-bounce ${
-          message.includes('successfully') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-        }`}>
-          {message}
-        </div>
-      )}
     </div>
   );
 };
