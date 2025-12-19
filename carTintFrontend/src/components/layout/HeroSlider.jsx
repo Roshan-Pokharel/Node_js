@@ -68,7 +68,7 @@ export default function HeroSlider() {
   }, [index, slides.length]);
 
   const [openForm, setOpenForm] = useState(false);
-  const phoneNumber = "+9779847256251";
+  const phoneNumber = "0433599495";
 
   return (
     <>

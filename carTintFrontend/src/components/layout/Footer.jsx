@@ -275,13 +275,18 @@ export default function Footer() {
             <h4 className="mb-4 font-semibold">Contact Us</h4>
             <ul className="space-y-3 text-gray-400 text-sm">
               <li className="flex gap-2 items-center">
-                <MapPin className="w-4 h-4" /> 4/17-19 Harrow Road, Auburn
+                <MapPin className="w-4 h-4" /> <a href="https://www.google.com/maps/search/?api=1&query=4%2F17-19+Harrow+Road%2C+Auburn+NSW+2144%2C+Australia" target="_blank">4/17-19 Harrow Road, Auburn </a>
               </li>
               <li className="flex gap-2 items-center">
-                <Phone className="w-4 h-4" /> 0433599495
+                <Phone className="w-4 h-4" />
+                 <a
+                    href={`tel:0433599495`}>0433 599 495</a> 
               </li>
               <li className="flex gap-2 items-center">
-                <Mail className="w-4 h-4" /> oztintandwrap@gmail.com
+                
+                <Mail className="w-4 h-4" /><a href="mailto:oztintandwrap@gmail.com?subject=Support%20Request&body=Hello,%20I%20need%20help%20with...">
+                  oztintandwrap@gmail.com
+                </a>
               </li>
             </ul>
           </div>
@@ -317,11 +322,13 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
-        <div className="border-t border-gray-800 pt-6 text-center text-gray-400 text-sm">
-          © 2025 OZ Tint & Wrap. All rights reserved.
+        
+        <div className=" flex justify-center gap-1 border-t border-gray-800 pt-6 text-center text-gray-400 text-sm">
+           <Link to="/admin/login " className="cursor-text">
+         ©
+        </Link>
+           2025 OZ Tint & Wrap. All rights reserved.  
         </div>
-
       </div>
     </footer>
   );

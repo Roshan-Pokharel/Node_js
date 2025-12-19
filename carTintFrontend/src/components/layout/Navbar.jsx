@@ -7,7 +7,7 @@ import logoImage from '../../assets/UZlogo.png';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const phoneNumber = "+9779847256251"; 
+  const phoneNumber = "0433599495"; 
 
   return (
    <nav className="bg-gradient-to-r from-zinc-900 via-slate-900 to-zinc-900 text-slate-100 sticky top-0 z-50 shadow-xl border-b border-white/10 flex flex-col">
@@ -66,7 +66,7 @@ export default function Navbar() {
 
 
         {/* --- Desktop Menu (Hidden on Mobile) --- */}
-        <div className="absolute md:right-1 hidden md:flex md:space-x-5 lg:space-x-6 items-center ">
+        <div className="absolute md:right-10 hidden md:flex md:space-x-5 lg:space-x-6 items-center ">
         <NavLink
             to="/"
             className={({ isActive }) =>
@@ -79,7 +79,6 @@ export default function Navbar() {
           >
             Home
           </NavLink>
-
           <NavLink
             to="/service"
             className={({ isActive }) =>

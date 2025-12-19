@@ -104,13 +104,13 @@ function Rating() {
   };
 
   return (
-    <div className="min-h-auto md:min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
+    <div className="min-h-auto lg:min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
       {/* Container - Wider on Desktop (max-w-2xl) */}
       <div className="bg-white shadow-2xl rounded-2xl overflow-hidden max-w-2xl w-full border border-gray-100 transition-all duration-300">
         
         {/* Modern Header with Gradient */}
         <div className="bg-gradient-to-r from-gray-150 to-gray-100 py-8 px-4 text-center">
-          <h1 className="text-3xl font-extrabold text-slate-700 tracking-tight">Oz Tint & Wrap</h1>
+          <h1 className="text-3xl font-extrabold text-slate-700 tracking-tight">OZ Tint & Wrap</h1>
           <p className="text-gray-400 text-sm mt-1 uppercase tracking-widest">Verification & Review</p>
         </div>
 

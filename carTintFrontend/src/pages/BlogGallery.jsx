@@ -56,9 +56,6 @@ const BlogGallery = () => {
                   {blog.description}
                 </p>
 
-                <button className="mt-4 text-blue-600 font-semibold hover:underline">
-                  Read More →
-                </button>
               </div>
             </div>
           ))}

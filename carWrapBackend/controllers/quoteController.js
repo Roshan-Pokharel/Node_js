@@ -133,3 +133,21 @@ exports.createQuote = async (req, res) => {
     });
   }
 };
+
+exports.getQuotes = async (req, res) => {
+  try {
+    const quotes = await Quote.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: quotes });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+exports.deleteQuote = async (req, res) => {
+  try {
+    await Quote.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'Quote deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
