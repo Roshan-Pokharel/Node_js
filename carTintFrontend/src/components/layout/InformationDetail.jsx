@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -20,6 +20,7 @@ const SERVICE_TITLES = {
 };
 
 const InformationDetail = () => {
+  const successRef = useRef(null);
   const location = useLocation();
   const selectedShade = location.state?.shade;
   const selectedCoverage = location.state?.coverage;
@@ -83,10 +84,21 @@ const InformationDetail = () => {
     }
   };
 
+ useEffect(() => {
+  if (status === 'success' && successRef.current) {
+    successRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+}, [status]);
+
+
+
   // ---------------- SUCCESS VIEW ----------------
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div ref={successRef} className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="bg-white p-10 rounded-2xl shadow-xl text-center max-w-lg w-full">
           <div className="flex justify-center mb-6">
             <div className="bg-green-100 p-4 rounded-full">

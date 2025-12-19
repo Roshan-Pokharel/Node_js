@@ -106,6 +106,19 @@ export default function Navbar() {
             Book Now
           </NavLink>
 
+          <NavLink
+            to="/bloggallery"
+            className={({ isActive }) =>
+              `relative pb-1 text-slate-300 hover:text-cyan-400 transition-colors duration-300
+              after:absolute after:left-1/2 after:-bottom-0.5 after:h-[2px] after:bg-cyan-400
+              after:transition-all after:duration-300 after:ease-out
+              after:-translate-x-1/2
+              ${isActive ? "after:w-full text-white" : "after:w-0"}`
+            }
+          >
+            Blog
+          </NavLink>
+
            <NavLink
             to="/about"
             className={({ isActive }) =>
@@ -236,6 +249,21 @@ export default function Navbar() {
     onClick={() => setIsMenuOpen(false)}
   >
     Book Now
+  </NavLink>
+
+  <NavLink
+    to="/bloggallery"
+    className={({ isActive }) =>
+      `block px-4 py-3 rounded-xl text-base font-medium
+       transition-all duration-300
+       ${isActive
+         ? "bg-slate-700/70 text-white shadow-inner"
+         : "text-slate-300 hover:text-cyan-400 hover:bg-slate-800/70"
+       }`
+    }
+    onClick={() => setIsMenuOpen(false)}
+  >
+    Blog
   </NavLink>
 
   <NavLink

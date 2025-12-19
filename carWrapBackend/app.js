@@ -6,6 +6,7 @@ const quoteRoutes = require('./routes/QuoteRoutes');
 const BookingRoutes = require('./routes/bookingRoutes');
 const otpRoutes = require('./routes/otpRoutes');
 const hitRoutes = require('./routes/hitRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 
 const app = express();
 
@@ -17,11 +18,17 @@ app.use(cors());
 app.use(express.json()); // Parses incoming JSON
 app.use(express.urlencoded({ extended: true })); // Parses URL-encoded data
 
+app.use('/uploads', express.static('uploads'));
+
 // Routes
 app.use('/api/quotes', quoteRoutes);
 app.use('/api/bookings', BookingRoutes);
 app.use('/api', otpRoutes);
 app.use('/api/hits', hitRoutes);
+app.use('/api/blogs', blogRoutes);
+
+
+
 
 // 404 Handler
 app.use((req, res) => {

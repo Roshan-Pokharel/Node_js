@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { 
   Calendar, 
   Car, 
@@ -11,7 +11,11 @@ import {
   AlertCircle 
 } from 'lucide-react';
 
+
+
 const BookingForm = () => {
+
+
   const [formData, setFormData] = useState({
     serviceType: '', 
     serviceName: '', 
@@ -28,12 +32,18 @@ const BookingForm = () => {
     date: ''
   });
 
+
+
+
+
   // State management to match InformationDetail.jsx pattern
   const [status, setStatus] = useState('idle'); // 'idle', 'submitting', 'success', 'error'
   const [errorMessage, setErrorMessage] = useState('');
 
   // Enhanced Tailwind classes
-  const inputClass = "w-full p-3 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400";
+  const inputClass =
+  "w-full p-3 bg-white border border-slate-200 rounded-lg text-slate-900 text-base md:text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400";
+
   const labelClass = "flex items-center gap-2 mb-2 font-semibold text-slate-700 text-sm";
   const sectionWrapper = "bg-white p-6 rounded-xl border border-slate-100 shadow-sm mb-6";
 
@@ -103,10 +113,21 @@ const BookingForm = () => {
     setStatus('idle');
   };
 
+ useEffect(() => {
+  if (status === 'success') {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }
+}, [status]);
+
+
+
   // --- SUCCESS VIEW (Replaces Form on Success) ---
   if (status === 'success') {
     return (
-      <div className="max-w-2xl mx-auto my-12 p-10 bg-white text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 font-sans text-center">
+      <div  className="max-w-2xl mx-auto my-12 p-10 bg-white text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 font-sans text-center">
         <div className="flex justify-center mb-6">
           <div className="bg-emerald-100 p-4 rounded-full">
             <CheckCircle className="w-12 h-12 text-emerald-600" />
@@ -126,6 +147,9 @@ const BookingForm = () => {
       </div>
     );
   }
+
+ 
+
 
   return (
     <div className="max-w-2xl  mx-auto my-12 p-4 md:p-10 bg-slate-50 text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white font-sans ">

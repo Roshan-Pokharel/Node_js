@@ -6,6 +6,7 @@ import InformationDetail from '../components/layout/InformationDetail'
 import BookingForm from '../pages/BookingForm';
 import About from '../pages/About';
 import Reviews from '../pages/Reviews';
+import BlogGallery from '../pages/BlogGallery';
 
 export default function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export default function AppRoutes() {
       <Route path="/bookings" element={<BookingForm />} />
       <Route path="/about" element={<About />} />
       <Route path="/allreviews" element={<Reviews />} />
+      <Route path="/bloggallery" element={<BlogGallery />} />
     </Routes>
    
   )

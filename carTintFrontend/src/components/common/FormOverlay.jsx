@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Car, FileText, Layers, Clock, Lightbulb, Send, Info, MapPin } from 'lucide-react';
+import { X, Check, Car, File, Layers, Clock, Lightbulb, Send, Info, MapPin } from 'lucide-react';
 
 /* ================= NSW SUBURBS LIST ================= */
 const NSW_SUBURBS = [
@@ -256,7 +256,7 @@ function StepOne({ data, update }) {
 function StepTwo({ data, update }) {
   const options = [
     { id: "headlight", label: "Headlight Restoration", sub: "Restore clarity & safety", icon: <Lightbulb size={40} className="text-yellow-500" /> },
-    { id: "tinting", label: "Window Tinting", sub: "UV Protection & Privacy", icon: <FileText size={40} className="text-red-500" /> },
+    { id: "tinting", label: "Window Tinting", sub: "UV Protection & Privacy", icon: <File size={40} className="text-red-500" /> },
     { id: "wrap", label: "Vehicle Wrap", sub: "Color Change & Branding", icon: <Layers size={40} className="text-purple-500" /> }
   ];
 
