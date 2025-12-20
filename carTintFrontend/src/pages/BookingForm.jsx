@@ -140,7 +140,7 @@ const BookingForm = () => {
         </p>
         <button 
           onClick={resetForm}
-          className="w-full py-4 bg-slate-900 text-white rounded-xl text-lg font-bold hover:bg-slate-800 transition-all"
+          className="w-full py-4 bg-slate-800 text-white rounded-xl text-lg font-bold hover:bg-slate-800 transition-all"
         >
           Book Another Service
         </button>

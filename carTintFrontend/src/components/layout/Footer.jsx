@@ -324,10 +324,7 @@ export default function Footer() {
         </div>
         
         <div className=" flex justify-center gap-1 border-t border-gray-800 pt-6 text-center text-gray-400 text-sm">
-           <Link to="/admin/login " className="cursor-text">
-         ©
-        </Link>
-           2025 OZ Tint & Wrap. All rights reserved.  
+         © 2025 OZ Tint & Wrap. All rights reserved.  
         </div>
       </div>
     </footer>

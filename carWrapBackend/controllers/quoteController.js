@@ -143,11 +143,65 @@ exports.getQuotes = async (req, res) => {
   }
 };
 
-exports.deleteQuote = async (req, res) => {
+exports.deleteQuote = async (req, res) => { 
   try {
     await Quote.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true, message: 'Quote deleted' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
+};
+
+exports.addCostAndSendEmail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { cost } = req.body;
+
+        if (!cost) {
+            return res.status(400).json({ success: false, message: 'Cost is required' });
+        }
+
+        // 1. Update Quote in DB
+        const quote = await Quote.findByIdAndUpdate(
+            id, 
+            { cost: cost, status: 'Quoted' }, 
+            { new: true }
+        );
+
+        if (!quote) return res.status(404).json({ success: false, message: 'Quote not found' });
+
+        // 2. Send Email
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: quote.email,
+            subject: 'Your Service Quote Estimation',
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2>Quote for ${quote.serviceType} Service</h2>
+                    <p>Hi ${quote.fullName},</p>
+                    <p>Thank you for your inquiry regarding your <strong>${quote.vehicleReg}</strong>.</p>
+                    
+                    <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <h3 style="margin:0; color: #333;">Estimated Cost: $${cost}</h3>
+                    </div>
+
+                    <p><strong>Service Details:</strong><br/>
+                    Type: ${quote.serviceType}<br/>
+                    ${quote.repairPart ? `Repair Part: ${quote.repairPart}<br/>` : ''}
+                    ${quote.tintCondition ? `Tint Condition: ${quote.tintCondition}<br/>` : ''}
+                    </p>
+
+                    <p>To proceed with this booking, please reply to this email or call us.</p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ success: true, data: quote, message: 'Quote sent successfully!' });
+
+    } catch (error) {
+        console.error('Error sending quote:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 };

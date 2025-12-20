@@ -171,3 +171,62 @@ exports.deleteBooking = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+exports.updateBookingStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // 'Accepted', 'Completed', or 'Cancelled'
+
+    const booking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found' });
+    }
+
+    // --- EMAIL LOGIC ---
+    let emailSubject = '';
+    let emailBody = '';
+
+    if (status === 'Accepted') {
+      emailSubject = 'Booking Confirmed - Service Scheduled';
+      emailBody = `<h3>Hello ${booking.firstName},</h3>
+                   <p>Your booking for <strong>${booking.serviceName}</strong> has been <strong>Accepted</strong>.</p>
+                   <p><strong>Scheduled Date:</strong> ${booking.date}</p>
+                   <p>We look forward to seeing you!</p>`;
+    } else if (status === 'Completed') {
+      emailSubject = 'Service Completed - Thank You!';
+      emailBody = `<h3>Hello ${booking.firstName},</h3>
+                   <p>Your <strong>${booking.serviceName}</strong> service for your ${booking.make} ${booking.model} has been marked as <strong>Completed</strong>.</p>
+                   <p>Thank you for choosing us! We hope to see you again soon.</p>`;
+    } else if (status === 'Cancelled') {
+      emailSubject = 'Booking Cancellation Notice';
+      emailBody = `<h3>Hello ${booking.firstName},</h3>
+                   <p>Your booking for <strong>${booking.serviceName}</strong> on ${booking.date} has been <strong>Cancelled</strong>.</p>
+                   <p>If you have any questions or wish to reschedule, please contact us.</p>`;
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: booking.email,
+      subject: emailSubject,
+      html: `<div style="font-family: Arial; padding: 20px; border: 1px solid #eee;">
+                ${emailBody}
+                <br/><hr/>
+                <p style="font-size: 12px; color: #777;">Automated message from your Service Dashboard.</p>
+             </div>`
+    };
+
+    // Send email (we don't 'await' it if we don't want to block the response, 
+    // but it's safer to await to catch errors)
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ 
+      success: true, 
+      message: `Booking ${status} and email sent to ${booking.email}` 
+    });
+
+  } catch (error) {
+    console.error("Status Update Error:", error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
