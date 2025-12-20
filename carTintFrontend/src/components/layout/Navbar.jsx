@@ -49,7 +49,7 @@ export default function Navbar() {
         <Link
         to="/"
         onClick={() => setIsMenuOpen(false)}
-        className=" absolute md:left-0  font-bold tracking-wide text-cyan-400 hover:text-emerald-400 transition duration-300 z-50"
+        className=" absolute md:left-0  font-bold tracking-wide text-cyan-400 hover:text-emerald-400 transition duration-300 z-30"
           >
           <img
             src={logoImage}

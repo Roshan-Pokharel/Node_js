@@ -1,5 +1,6 @@
 import React from 'react';
 import { ImageWithFallback } from '../common/ImageWithFallback';
+import HeadlightRestoration from '../../assets/headlightRestoration.png';
 
 export function WorkSection() {
  const works = [
@@ -12,7 +13,7 @@ export function WorkSection() {
     },
     {
       // REPLACED: Headlight Restoration
-      image: 'https://i.pinimg.com/originals/fe/bb/ac/febbac2594c81c1a4df73d8e90e9deab.jpg',
+      image: HeadlightRestoration,
       title: 'Headlight Restoration',
       category: 'Restoration',
       description: 'Restoring crystal clear visibility to cloudy headlights for improved safety and aesthetics.'

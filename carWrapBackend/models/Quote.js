@@ -19,6 +19,7 @@ const QuoteSchema = new mongoose.Schema({
   email: { type: String, required: true },
   comments: { type: String },
   mailingList: { type: Boolean, default: false },
+  cost: { type: Number },
   status: { type: String, default: 'Pending' },
 
   // Automatically add createdAt and updatedAt timestamps

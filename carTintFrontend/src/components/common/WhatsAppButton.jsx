@@ -8,7 +8,7 @@ const WhatsAppButton = () => {
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
   return (
-    <div className="fixed bottom-10 right-10 z-50 flex items-center justify-center w-16 h-16">
+    <div className="fixed bottom-10 right-5 z-50 flex items-center justify-center w-16 h-16">
       <a
         href={whatsappUrl}
         target="_blank"
