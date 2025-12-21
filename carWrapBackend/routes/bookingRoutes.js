@@ -1,15 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { createBooking, getBookings, deleteBooking, updateBookingStatus } = require('../controllers/bookingController');
+const {verifyAdmin} = require('../middleware/authMiddleware')
 
-router.route('/')
-  .post(createBooking)
-  .get(getBookings); 
-
-router.route('/:id').delete(deleteBooking);
-
-router.route('/:id/status')
-  .put(updateBookingStatus);
+router.post('/', createBooking);
+router.get('/', verifyAdmin, getBookings); 
+router.delete('/:id', verifyAdmin, deleteBooking);
+router.put('/:id/status', verifyAdmin, updateBookingStatus);
 
 
 
