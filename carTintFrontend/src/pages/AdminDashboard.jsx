@@ -37,48 +37,61 @@ const AdminDashboard = () => {
         setTimeout(() => setNotification(null), 3000);
     };
 
-    const fetchAllData = async () => {
-        try {
-            const [quotesRes, bookingsRes, blogsRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_URL}/api/quotes`),
-                axios.get(`${import.meta.env.VITE_API_URL}/api/bookings`),
-                axios.get(`${import.meta.env.VITE_API_URL}/api/blogs`)
-            ]);
+   // Inside fetchAllData function
+const fetchAllData = async () => {
+    try {
+        const [quotesRes, bookingsRes, blogsRes] = await Promise.all([
+            // Quotes might be public or protected, safer to include it if protected
+            axios.get(`${import.meta.env.VITE_API_URL}/api/quotes`, { withCredentials: true }),
             
-            setData({
-                quotes: quotesRes.data.data,
-                bookings: bookingsRes.data.data,
-                blogs: blogsRes.data.data
-            });
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching data", error);
+            // IMPORTANT: Bookings is now protected, so this is required
+            axios.get(`${import.meta.env.VITE_API_URL}/api/bookings`, { withCredentials: true }),
+            
+            axios.get(`${import.meta.env.VITE_API_URL}/api/blogs`) 
+        ]);
+        
+        setData({
+            quotes: quotesRes.data.data,
+            bookings: bookingsRes.data.data,
+            blogs: blogsRes.data.data
+        });
+        setLoading(false);
+    } catch (error) {
+        console.error("Error fetching data", error);
+        // If error is 401 (Unauthorized), redirect to login
+        if (error.response && error.response.status === 401) {
+            navigate('/admin/login');
+        } else {
             showNotification("Failed to load data.", "error");
-            setLoading(false);
         }
-    };
+        setLoading(false);
+    }
+};
 
     const handleBookingStatus = async (bookingId, newStatus) => {
-        showNotification(`Processing ${newStatus} status...`, "info");
-        setUpdatingStatusId(bookingId);
+    showNotification(`Processing ${newStatus} status...`, "info");
+    setUpdatingStatusId(bookingId);
 
-        try {
-            const response = await axios.put(
-                `${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/status`, 
-                { status: newStatus }
-            );
-            
-            if (response.data.success) {
-                showNotification(`Success: ${newStatus} email sent.`);
-                fetchAllData(); 
-            }
-        } catch (error) {
-            console.error(error);
-            showNotification("Failed to update status.", "error");
-        } finally {
-            setUpdatingStatusId(null);
+    try {
+        // NOTICE: { withCredentials: true } is added as the 3rd argument
+        const response = await axios.put(
+            `${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/status`, 
+            { status: newStatus },
+            { withCredentials: true } 
+        );
+        
+        if (response.data.success) {
+            showNotification(`Success: ${newStatus} email sent.`);
+            fetchAllData(); 
         }
-    };
+    } catch (error) {
+        console.error(error);
+        if (error.response && error.response.status === 401) navigate('/admin/login');
+        showNotification("Failed to update status.", "error");
+    } finally {
+        setUpdatingStatusId(null);
+    }
+};
 
     const handleCostSubmit = async (quoteId) => {
         const cost = costInputs[quoteId];
@@ -86,7 +99,7 @@ const AdminDashboard = () => {
 
         setSendingCostId(quoteId);
         try {
-            await axios.put(`${import.meta.env.VITE_API_URL}/api/quotes/${quoteId}/cost`, { cost });
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/quotes/${quoteId}/cost`, { cost }, { withCredentials: true });
             showNotification("Cost sent to customer successfully!");
             const newInputs = { ...costInputs };
             delete newInputs[quoteId];
@@ -112,26 +125,32 @@ const AdminDashboard = () => {
     const confirmDelete = (type, id) => setDeleteModal({ show: true, type, id });
 
     const executeDelete = async () => {
-        const { type, id } = deleteModal;
-        try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/${type}/${id}`);
-            showNotification(`${type.slice(0, -1)} deleted successfully!`);
-            fetchAllData();
-        } catch {
-            showNotification(`Failed to delete ${type}.`, 'error');
-        } finally {
-            setDeleteModal({ show: false, type: null, id: null });
-        }
-    };
+    const { type, id } = deleteModal;
+    try {
+        // NOTICE: { withCredentials: true } is added as the 2nd argument
+        await axios.delete(
+            `${import.meta.env.VITE_API_URL}/api/${type}/${id}`, 
+            { withCredentials: true }
+        );
+        
+        showNotification(`${type.slice(0, -1)} deleted successfully!`);
+        fetchAllData();
+    } catch (error) {
+        if (error.response && error.response.status === 401) navigate('/admin/login');
+        showNotification(`Failed to delete ${type}.`, 'error');
+    } finally {
+        setDeleteModal({ show: false, type: null, id: null });
+    }
+};
 
     const handleBlogSubmit = async (e) => {
         e.preventDefault();
         try {
             if (isEditingBlogId) {
-                await axios.put(`${import.meta.env.VITE_API_URL}/api/blogs/${isEditingBlogId}`, blogForm);
+                await axios.put(`${import.meta.env.VITE_API_URL}/api/blogs/${isEditingBlogId}`, blogForm, { withCredentials: true });
                 showNotification('Blog updated!');
             } else {
-                await axios.post(`${import.meta.env.VITE_API_URL}/api/blogs`, blogForm);
+                await axios.post(`${import.meta.env.VITE_API_URL}/api/blogs`, blogForm, { withCredentials: true });
                 showNotification('Blog created!');
             }
             setBlogForm({ title: '', description: '', image: '' });

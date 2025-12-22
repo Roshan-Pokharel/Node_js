@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Blog = require('../models/Blog');
+const {verifyAdmin} = require('../middleware/authMiddleware');
 
 // GET all blogs
 router.get('/', async (req, res) => {
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST create blog
-router.post('/', async (req, res) => {
+router.post('/', verifyAdmin, async (req, res) => {
   try {
     const newBlog = await Blog.create(req.body);
     res.status(201).json({ success: true, data: newBlog });
@@ -23,7 +24,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update blog
-router.put('/:id', async (req, res) => {
+router.put('/:id',verifyAdmin, async (req, res) => {
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json({ success: true, data: updatedBlog });
@@ -33,7 +34,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE blog
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',verifyAdmin, async (req, res) => {
   try {
     await Blog.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true, message: 'Blog deleted' });
