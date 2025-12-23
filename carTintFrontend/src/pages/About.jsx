@@ -12,7 +12,7 @@ const About = () => {
             Premium Automotive Styling
           </h2>
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Sydney’s Premier Tint & Wrap Specialists
+            Sydney’s Premium Tint & Wrap Specialists
           </h1>
           <div className="w-20 h-1 bg-[#6c5ce7] mx-auto rounded-full"></div>
         </div>
@@ -65,7 +65,7 @@ const About = () => {
         {/* Bottom Stats / Trust Indicators */}
         <div className="mt-24 pt-10 border-t border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
-            <div className="text-4xl font-extrabold text-gray-900 mb-2">100%</div>
+            <div className="text-4xl font-extrabold text-gray-900 mb-2">99%</div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">UV Protection</p>
           </div>
           <div>

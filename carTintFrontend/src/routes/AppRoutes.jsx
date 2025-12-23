@@ -21,7 +21,7 @@ export default function AppRoutes() {
       <Route path="/service" element={<Services />} />
       <Route path="/service/:serviceId" element={<ServiceDetail />} />
       <Route path="/service/:serviceId/book" element={<InformationDetail />} />
-      <Route path="/bookings" element={<BookingForm />} />
+      <Route path="/bookings" element={<BookingForm /> }   />
       <Route path="/about" element={<About />} />
       <Route path="/allreviews" element={<Reviews />} />
       <Route path="/bloggallery" element={<BlogGallery />} />

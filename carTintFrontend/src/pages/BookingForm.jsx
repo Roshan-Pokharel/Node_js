@@ -1,4 +1,5 @@
 import React, { useState, useEffect  } from 'react';
+import ManageBooking from "../components/layout/ManageBooking";
 import { 
   Calendar, 
   Car, 
@@ -152,6 +153,7 @@ const BookingForm = () => {
 
 
   return (
+    <>
     <div className="max-w-2xl  mx-auto my-12 p-4 md:p-10 bg-slate-50 text-slate-900 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white font-sans ">
       
       <div className="text-center mb-10">
@@ -303,6 +305,8 @@ const BookingForm = () => {
         )}
       </form>
     </div>
+    <ManageBooking />
+    </>
   );
 };
 

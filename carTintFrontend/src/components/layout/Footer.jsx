@@ -275,7 +275,7 @@ export default function Footer() {
             <h4 className="mb-4 font-semibold">Contact Us</h4>
             <ul className="space-y-3 text-gray-400 text-sm">
               <li className="flex gap-2 items-center">
-                <MapPin className="w-4 h-4" /> <a href="https://www.google.com/maps/search/?api=1&query=4%2F17-19+Harrow+Road%2C+Auburn+NSW+2144%2C+Australia" target="_blank">4/17-19 Harrow Road, Auburn </a>
+                <MapPin className="w-4 h-4" /> <a href="https://www.google.com/maps/search/?api=1&query=Harrow+Road%2C+Auburn+NSW+2144%2C+Australia" target="_blank">Harrow Road, Auburn </a>
               </li>
               <li className="flex gap-2 items-center">
                 <Phone className="w-4 h-4" />

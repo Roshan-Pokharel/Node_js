@@ -3,13 +3,13 @@ import { ServicesSection } from "../components/layout/ServiceSection";
 import { ReviewsSection } from "../components/layout/ReviewsSection";
 import { WorkSection } from "../components/layout/WorkSection";
 import Rating from "../components/layout/Rating";
-import Hero from "../components/layout/Hero";
+// import Hero from "../components/layout/Hero";
 
 export default function Home() {
   return (
     <>
       <HeroSlider />
-      <Hero />
+      {/* <Hero /> */}
       <ServicesSection />
       <WorkSection />
       <ReviewsSection />

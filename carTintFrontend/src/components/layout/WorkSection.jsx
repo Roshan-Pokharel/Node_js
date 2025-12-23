@@ -42,7 +42,7 @@ export function WorkSection() {
     <section id="work" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-gray-900 text-3xl font-bold mb-4">Our Work</h2>
+          <h2 className="text-gray-900 text-3xl font-bold mb-4">Our <span className='text-red-600'>Work</span></h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Explore our portfolio of stunning car wrap transformations. Each project showcases our commitment to quality and attention to detail.
           </p>

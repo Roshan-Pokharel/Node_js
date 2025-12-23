@@ -1,4 +1,5 @@
 const Booking = require('../models/Booking');
+const otpStore = require('../services/otpStore'); // Ensure this matches your directory
 // Ensure the path below matches where your mailing.js file is located.
 // If bookingController is in /controllers and mailing.js is in the root, use '../mailing'
 const transporter = require('../services/mailing'); 
@@ -227,6 +228,116 @@ exports.updateBookingStatus = async (req, res) => {
 
   } catch (error) {
     console.error("Status Update Error:", error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.sendManageOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    // 1. Check if any booking exists for this email
+    const bookingExists = await Booking.findOne({ email });
+    
+    if (!bookingExists) {
+      return res.status(404).json({ success: false, message: 'No bookings found for this email.' });
+    }
+
+    // 2. Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = otp;
+    setTimeout(() => delete otpStore[email], 10 * 60 * 1000); // Expires in 10 mins
+
+    // 3. Send Email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Manage Your Booking - Verification Code',
+      html: `<div style="font-family: sans-serif; padding: 20px;">
+              <h2>Verification Code</h2>
+              <p>Use the code below to access and manage your bookings:</p>
+              <h1 style="background: #eee; padding: 10px; display: inline-block;">${otp}</h1>
+              <p>This code expires in 10 minutes.</p>
+             </div>`
+    });
+
+    res.json({ success: true, message: 'OTP sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server error sending OTP' });
+  }
+};
+
+exports.verifyManageOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    
+    if (otpStore[email] && otpStore[email] === otp) {
+      delete otpStore[email]; // Clear OTP after use
+      
+      // Return all bookings for this user
+      const bookings = await Booking.find({ email }).sort({ date: 1 });
+      
+      res.json({ success: true, bookings });
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.customerCancelBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.body; // Pass email to ensure ownership
+
+    const booking = await Booking.findOneAndDelete({ _id: id, email });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found or access denied' });
+    }
+
+    // Optional: Send cancellation email to Admin
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: process.env.EMAIL_USER,
+        subject: `Booking Cancelled by Customer: ${booking.serviceName}`,
+        html: `<p>Customer <strong>${booking.firstName} ${booking.lastName}</strong> has cancelled their booking for <strong>${booking.date}</strong>.</p>`
+    });
+
+    res.json({ success: true, message: 'Booking cancelled' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.customerUpdateBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { emailVerification, ...updateData } = req.body;
+
+    // Security: Only allow update if the email matches the record (Simple ownership check)
+    // In a production app, use JWT tokens. Here we trust the flow from the OTP step.
+    const booking = await Booking.findOneAndUpdate(
+      { _id: id, email: emailVerification }, // Ensure user owns the booking
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found or access denied' });
+    }
+
+    // Notify Admin of Change
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: `Booking Updated: ${booking.firstName}`,
+      html: `<p>Customer updated their booking details. New Date: ${booking.date}. Service: ${booking.serviceName}</p>`
+    });
+
+    res.json({ success: true, booking });
+  } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
