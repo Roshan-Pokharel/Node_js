@@ -1,160 +1,98 @@
 const Booking = require('../models/Booking');
 const otpStore = require('../services/otpStore'); // Ensure this matches your directory
-// Ensure the path below matches where your mailing.js file is located.
-// If bookingController is in /controllers and mailing.js is in the root, use '../mailing'
-const transporter = require('../services/mailing'); 
+const transporter = require('../services/mailing'); // Ensure this matches your directory
 
+// --- HELPER: Professional Email Template Generator ---
+// This standardizes the look of all emails sent by the system.
+const generateEmailTemplate = (title, content, footerText = '') => {
+  return `
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding: 40px 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+      
+      <div style="background-color: #1e293b; padding: 30px; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px;">Oz Tint & Wrap</h1>
+        <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 14px;">${title}</p>
+      </div>
 
+      <div style="padding: 30px; color: #334155; line-height: 1.6;">
+        ${content}
+      </div>
+
+      <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+        <p style="color: #64748b; font-size: 12px; margin: 0;">
+          © ${new Date().getFullYear()} Oz Tint & Wrap. All rights reserved.<br>
+          ${footerText}
+        </p>
+      </div>
+    </div>
+  </div>
+  `;
+};
+
+// 1. Create a New Booking
 exports.createBooking = async (req, res) => {
   try {
-    // 1. Create the new booking object
     const newBooking = new Booking(req.body);
-
-    // 2. Save to MongoDB
     const savedBooking = await newBooking.save();
 
-    // --- EMAIL LOGIC START ---
-
-    // Extract details for the email
     const { 
       firstName, lastName, email, phone, 
-      make, model, year, 
-      serviceName, date, 
+      make, model, year, serviceName, date, 
       selectedShade, selectedCoverage, selectedHeadlights 
     } = savedBooking;
 
-    // Construct the specific details string (handles optional fields like tint shade)
-    let specificDetails = '';
-    if (selectedShade) specificDetails += `\nShade: ${selectedShade}`;
-    if (selectedCoverage) specificDetails += `\nCoverage: ${selectedCoverage}`;
-    if (selectedHeadlights) specificDetails += `\nHeadlights: ${selectedHeadlights}`;
+    // --- Admin Notification Content ---
+    const adminContent = `
+      <h2 style="color: #1e293b; margin-top: 0;">New Booking Request</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Customer</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">${firstName} ${lastName}</td></tr>
+        <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Email</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">${email}</td></tr>
+        <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Phone</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">${phone}</td></tr>
+        <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Vehicle</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">${year} ${make} ${model}</td></tr>
+        <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Service</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #2563eb;">${serviceName}</td></tr>
+        <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Requested Date</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">${date}</td></tr>
+        ${selectedShade ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Shade</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">${selectedShade}</td></tr>` : ''}
+        ${selectedCoverage ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Coverage</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">${selectedCoverage}</td></tr>` : ''}
+        ${selectedHeadlights ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Headlights</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">${selectedHeadlights}</td></tr>` : ''}
+      </table>
+    `;
 
-    // A. Email to Admin (You)
-      const adminMailOptions = {
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER, // Send to yourself
-    subject: `New Booking Alert: ${serviceName} - ${date}`,
-    html: `
-    <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
-      <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-        
-        <div style="background:#111827; color:#ffffff; padding:20px; text-align:center;">
-          <h2 style="margin:0;">New Booking Received</h2>
-          <p style="margin:5px 0; font-size:14px;">Oz Tint & Wrap</p>
-        </div>
-
-        <div style="padding:20px; color:#374151;">
-          
-          <h3 style="border-bottom:1px solid #e5e7eb; padding-bottom:5px;">Customer Details</h3>
-          <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Phone:</strong> ${phone}</p>
-
-          <h3 style="border-bottom:1px solid #e5e7eb; padding-bottom:5px; margin-top:20px;">Vehicle Details</h3>
-          <p><strong>Car:</strong> ${year} ${make} ${model}</p>
-
-          <h3 style="border-bottom:1px solid #e5e7eb; padding-bottom:5px; margin-top:20px;">Service Details</h3>
-          <p><strong>Service:</strong> ${serviceName}</p>
-
-          ${
-            serviceName === 'Window Tinting'
-              ? `
-                <p><strong>Selected Shade:</strong> ${selectedShade}</p>
-                <p><strong>Coverage:</strong> ${selectedCoverage}</p>
-              `
-              : `
-                <p><strong>Selected Headlights:</strong> ${selectedHeadlights}</p>
-              `
-          }
-
-          <p><strong>Date Requested:</strong> ${date}</p>
-
-          ${
-            specificDetails
-              ? `<p><strong>Additional Notes:</strong><br>${specificDetails}</p>`
-              : ''
-          }
-        </div>
-
-        <div style="background:#f9fafb; padding:15px; text-align:center; font-size:12px; color:#6b7280;">
-          © ${new Date().getFullYear()} Oz Tint & Wrap
-        </div>
+    // --- Customer Receipt Content ---
+    const customerContent = `
+      <h2 style="color: #1e293b;">Booking Received!</h2>
+      <p>Hi <strong>${firstName}</strong>,</p>
+      <p>Thanks for choosing Oz Tint & Wrap. We have received your request for <strong>${serviceName}</strong> on <strong>${date}</strong>.</p>
+      <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0; font-size: 14px; color: #475569;"><strong>Vehicle:</strong> ${year} ${make} ${model}</p>
       </div>
-    </div>
-    `
-  };
+      <p>Our team will review your request and contact you shortly to confirm the details.</p>
+    `;
 
-
-    // B. Email to Customer
-        const customerMailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Booking Confirmation - Oz Tint & Wrap',
-      html: `
-      <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
-        <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden;">
-          
-          <div style="background:#2563eb; color:#ffffff; padding:20px; text-align:center;">
-            <h2 style="margin:0;">Booking Confirmed</h2>
-            <p style="margin:5px 0; font-size:14px;">Thank you for choosing us!</p>
-          </div>
-
-          <div style="padding:20px; color:#374151;">
-            <p>Hi <strong>${firstName}</strong>,</p>
-
-            <p>Thank you for booking with <strong>Oz Tint & Wrap</strong>.  
-            We have successfully received your request.</p>
-
-            <h3 style="border-bottom:1px solid #e5e7eb; padding-bottom:5px;">Your Booking Details</h3>
-
-            <p><strong>Service:</strong> ${serviceName}</p>
-            <p><strong>Vehicle:</strong> ${year} ${make} ${model}</p>
-            <p><strong>Preferred Date:</strong> ${date}</p>
-
-            <p style="margin-top:20px;">
-              Our team will contact you shortly if any additional information is needed.
-            </p>
-
-            <p style="margin-top:30px;">
-              Best regards,<br>
-              <strong>Oz Tint & Wrap Team</strong>
-            </p>
-          </div>
-
-          <div style="background:#f9fafb; padding:15px; text-align:center; font-size:12px; color:#6b7280;">
-            © ${new Date().getFullYear()} Oz Tint & Wrap
-          </div>
-        </div>
-      </div>
-      `
-    };
-
-
-    // Send both emails (using Promise.all to send them in parallel)
+    // Send Emails in Parallel
     await Promise.all([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(customerMailOptions)
+      transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: process.env.EMAIL_USER,
+        subject: `New Booking: ${serviceName} - ${date}`,
+        html: generateEmailTemplate('Admin Notification', adminContent)
+      }),
+      transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Booking Confirmation - Oz Tint & Wrap',
+        html: generateEmailTemplate('Customer Receipt', customerContent)
+      })
     ]);
 
-    // --- EMAIL LOGIC END ---
-
-    // 3. Respond to Frontend
-    res.status(201).json({ 
-      success: true, 
-      message: "Booking confirmed and emails sent successfully", 
-      data: savedBooking 
-    });
+    res.status(201).json({ success: true, message: "Booking confirmed", data: savedBooking });
 
   } catch (error) {
-    console.error("Booking/Email Error:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server error while processing booking",
-      error: error.message 
-    });
+    console.error("Booking Error:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
+// 2. Get All Bookings (Admin)
 exports.getBookings = async (req, res) => {
   try {
     const bookings = await Booking.find().sort({ createdAt: -1 });
@@ -164,6 +102,7 @@ exports.getBookings = async (req, res) => {
   }
 };
 
+// 3. Delete Booking (Admin)
 exports.deleteBooking = async (req, res) => {
   try {
     await Booking.findByIdAndDelete(req.params.id);
@@ -173,6 +112,7 @@ exports.deleteBooking = async (req, res) => {
   }
 };
 
+// 4. Update Booking Status (Admin)
 exports.updateBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -180,84 +120,78 @@ exports.updateBookingStatus = async (req, res) => {
 
     const booking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
 
-    if (!booking) {
-      return res.status(404).json({ success: false, message: 'Booking not found' });
-    }
+    if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
 
-    // --- EMAIL LOGIC ---
-    let emailSubject = '';
+    let emailTitle = 'Status Update';
     let emailBody = '';
 
     if (status === 'Accepted') {
-      emailSubject = 'Booking Confirmed - Service Scheduled';
-      emailBody = `<h3>Hello ${booking.firstName},</h3>
-                   <p>Your booking for <strong>${booking.serviceName}</strong> has been <strong>Accepted</strong>.</p>
-                   <p><strong>Scheduled Date:</strong> ${booking.date}</p>
-                   <p>We look forward to seeing you!</p>`;
+      emailTitle = 'Booking Accepted';
+      emailBody = `
+        <h2 style="color: #059669;">You're Booked In!</h2>
+        <p>Hi ${booking.firstName},</p>
+        <p>Your appointment for <strong>${booking.serviceName}</strong> has been <strong>confirmed</strong>.</p>
+        <p style="font-size: 18px; font-weight: bold; margin: 20px 0;">📅 Date: ${booking.date}</p>
+        <p>We look forward to seeing you.</p>
+      `;
     } else if (status === 'Completed') {
-      emailSubject = 'Service Completed - Thank You!';
-      emailBody = `<h3>Hello ${booking.firstName},</h3>
-                   <p>Your <strong>${booking.serviceName}</strong> service for your ${booking.make} ${booking.model} has been marked as <strong>Completed</strong>.</p>
-                   <p>Thank you for choosing us! We hope to see you again soon.</p>`;
+      emailTitle = 'Service Completed';
+      emailBody = `
+        <h2 style="color: #2563eb;">Service Complete</h2>
+        <p>Hi ${booking.firstName},</p>
+        <p>Your <strong>${booking.serviceName}</strong> for the ${booking.model} is complete.</p>
+        <p>Thank you for your business! Drive safely.</p>
+      `;
     } else if (status === 'Cancelled') {
-      emailSubject = 'Booking Cancellation Notice';
-      emailBody = `<h3>Hello ${booking.firstName},</h3>
-                   <p>Your booking for <strong>${booking.serviceName}</strong> on ${booking.date} has been <strong>Cancelled</strong>.</p>
-                   <p>If you have any questions or wish to reschedule, please contact us.</p>`;
+      emailTitle = 'Booking Cancelled';
+      emailBody = `
+        <h2 style="color: #dc2626;">Booking Cancelled</h2>
+        <p>Hi ${booking.firstName},</p>
+        <p>Your booking for ${booking.date} has been cancelled.</p>
+        <p>If this was a mistake, please contact us immediately.</p>
+      `;
     }
 
-    const mailOptions = {
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: booking.email,
-      subject: emailSubject,
-      html: `<div style="font-family: Arial; padding: 20px; border: 1px solid #eee;">
-                ${emailBody}
-                <br/><hr/>
-                <p style="font-size: 12px; color: #777;">Automated message from your Service Dashboard.</p>
-             </div>`
-    };
-
-    // Send email (we don't 'await' it if we don't want to block the response, 
-    // but it's safer to await to catch errors)
-    await transporter.sendMail(mailOptions);
-
-    res.status(200).json({ 
-      success: true, 
-      message: `Booking ${status} and email sent to ${booking.email}` 
+      subject: `Booking Update: ${status}`,
+      html: generateEmailTemplate(emailTitle, emailBody)
     });
 
+    res.status(200).json({ success: true, message: `Status updated to ${status}` });
+
   } catch (error) {
-    console.error("Status Update Error:", error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
+// 5. Send OTP for Customer Management
 exports.sendManageOtp = async (req, res) => {
   try {
     const { email } = req.body;
-    // 1. Check if any booking exists for this email
     const bookingExists = await Booking.findOne({ email });
     
     if (!bookingExists) {
       return res.status(404).json({ success: false, message: 'No bookings found for this email.' });
     }
 
-    // 2. Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[email] = otp;
     setTimeout(() => delete otpStore[email], 10 * 60 * 1000); // Expires in 10 mins
 
-    // 3. Send Email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Manage Your Booking - Verification Code',
-      html: `<div style="font-family: sans-serif; padding: 20px;">
-              <h2>Verification Code</h2>
-              <p>Use the code below to access and manage your bookings:</p>
-              <h1 style="background: #eee; padding: 10px; display: inline-block;">${otp}</h1>
-              <p>This code expires in 10 minutes.</p>
-             </div>`
+      html: generateEmailTemplate('Identity Verification', `
+          <h2>Your Verification Code</h2>
+          <p>Please use the code below to access your booking dashboard:</p>
+          <div style="background: #e2e8f0; color: #1e293b; padding: 15px 30px; display: inline-block; font-size: 24px; font-weight: bold; letter-spacing: 5px; border-radius: 8px;">
+              ${otp}
+          </div>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 20px;">This code expires in 10 minutes.</p>
+      `)
     });
 
     res.json({ success: true, message: 'OTP sent' });
@@ -267,16 +201,14 @@ exports.sendManageOtp = async (req, res) => {
   }
 };
 
+// 6. Verify OTP
 exports.verifyManageOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
     
     if (otpStore[email] && otpStore[email] === otp) {
       delete otpStore[email]; // Clear OTP after use
-      
-      // Return all bookings for this user
       const bookings = await Booking.find({ email }).sort({ date: 1 });
-      
       res.json({ success: true, bookings });
     } else {
       res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
@@ -286,10 +218,11 @@ exports.verifyManageOtp = async (req, res) => {
   }
 };
 
+// 7. Customer Cancels Booking (Modified: Handles Reason)
 exports.customerCancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const { email } = req.body; // Pass email to ensure ownership
+    const { email, reason } = req.body; // NOW ACCEPTS REASON
 
     const booking = await Booking.findOneAndDelete({ _id: id, email });
 
@@ -297,12 +230,23 @@ exports.customerCancelBooking = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Booking not found or access denied' });
     }
 
-    // Optional: Send cancellation email to Admin
+    // Email to Admin with Reason
+    const adminBody = `
+      <h2 style="color: #dc2626;">Booking Cancelled by Customer</h2>
+      <p><strong>Customer:</strong> ${booking.firstName} ${booking.lastName}</p>
+      <p><strong>Service:</strong> ${booking.serviceName}</p>
+      <p><strong>Date:</strong> ${booking.date}</p>
+      <div style="background: #fee2e2; border-left: 4px solid #ef4444; padding: 15px; margin-top: 15px; color: #991b1b;">
+        <strong>Reason for Cancellation:</strong><br/>
+        ${reason || "No reason provided."}
+      </div>
+    `;
+
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: process.env.EMAIL_USER,
-        subject: `Booking Cancelled by Customer: ${booking.serviceName}`,
-        html: `<p>Customer <strong>${booking.firstName} ${booking.lastName}</strong> has cancelled their booking for <strong>${booking.date}</strong>.</p>`
+        subject: `ACTION REQUIRED: Booking Cancelled - ${booking.firstName}`,
+        html: generateEmailTemplate('Cancellation Alert', adminBody)
     });
 
     res.json({ success: true, message: 'Booking cancelled' });
@@ -311,15 +255,15 @@ exports.customerCancelBooking = async (req, res) => {
   }
 };
 
+// 8. Customer Updates Booking
 exports.customerUpdateBooking = async (req, res) => {
   try {
     const { id } = req.params;
     const { emailVerification, ...updateData } = req.body;
 
-    // Security: Only allow update if the email matches the record (Simple ownership check)
-    // In a production app, use JWT tokens. Here we trust the flow from the OTP step.
+    // Security: Only allow update if the email matches the record
     const booking = await Booking.findOneAndUpdate(
-      { _id: id, email: emailVerification }, // Ensure user owns the booking
+      { _id: id, email: emailVerification }, 
       { $set: updateData },
       { new: true }
     );
@@ -328,12 +272,20 @@ exports.customerUpdateBooking = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Booking not found or access denied' });
     }
 
-    // Notify Admin of Change
+    const adminBody = `
+      <h2 style="color: #f59e0b;">Booking Updated by Customer</h2>
+      <p>The customer has modified their booking details.</p>
+      <p><strong>Customer:</strong> ${booking.firstName} ${booking.lastName}</p>
+      <p><strong>New Service:</strong> ${booking.serviceName}</p>
+      <p><strong>New Date:</strong> ${booking.date}</p>
+      <p>Please check your dashboard for full updated details.</p>
+    `;
+
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
       subject: `Booking Updated: ${booking.firstName}`,
-      html: `<p>Customer updated their booking details. New Date: ${booking.date}. Service: ${booking.serviceName}</p>`
+      html: generateEmailTemplate('Update Alert', adminBody)
     });
 
     res.json({ success: true, booking });
